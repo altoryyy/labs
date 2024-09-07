@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
+#include <string_view>
+#include <algorithm>
 
 class FinanceRecord
 {
@@ -8,35 +11,24 @@ public:
     std::string description;
     double amount;
 
-    FinanceRecord(const std::string &desc, double amt) : description(desc), amount(amt) {}
+    FinanceRecord(std::string_view desc, double amt) : description(desc), amount(amt) {}
 };
 
 class FinanceManager
 {
 private:
-    std::vector<FinanceRecord *> records;
-
-    // Вспомогательная функция для освобождения памяти
-    void clearRecords()
-    {
-        for (size_t i = 0; i < records.size(); ++i)
-        {
-            delete records[i];
-        }
-        records.clear();
-    }
+    std::vector<std::unique_ptr<FinanceRecord>> records;
 
 public:
     // Конструктор по умолчанию
-    FinanceManager() {}
+    FinanceManager() = default;
 
     // Копирующий конструктор
     FinanceManager(const FinanceManager &other)
     {
-        for (size_t i = 0; i < other.records.size(); ++i)
-        {
-            records.push_back(new FinanceRecord(*other.records[i]));
-        }
+        std::ranges::for_each(other.records, this {
+            records.push_back(std::make_unique<FinanceRecord>(*record));
+        });
     }
 
     // Оператор присваивания копированием
@@ -44,50 +36,36 @@ public:
     {
         if (this != &other)
         {
-            clearRecords();
-            for (size_t i = 0; i < other.records.size(); ++i)
-            {
-                records.push_back(new FinanceRecord(*other.records[i]));
-            }
+            records.clear();
+            std::ranges::for_each(other.records, this {
+                records.push_back(std::make_unique<FinanceRecord>(*record));
+            });
         }
         return *this;
     }
 
     // Конструктор перемещения
-    FinanceManager(FinanceManager &other) : records(other.records)
-    {
-        other.records.clear();
-    }
+    FinanceManager(FinanceManager &&other) noexcept = default;
 
     // Оператор присваивания перемещением
-    FinanceManager &operator=(FinanceManager &other)
-    {
-        if (this != &other)
-        {
-            clearRecords();
-            records = other.records;
-            other.records.clear();
-        }
-        return *this;
-    }
+    FinanceManager &operator=(FinanceManager &&other) noexcept = default;
 
     // Добавление записи
-    void addRecord(const std::string &description, double amount)
+    void addRecord(std::string_view description, double amount)
     {
-        records.push_back(new FinanceRecord(description, amount));
+        records.push_back(std::make_unique<FinanceRecord>(description, amount));
     }
 
     // Отображение записей
     void displayRecords() const
     {
-        for (size_t i = 0; i < records.size(); ++i)
-        {
-            std::cout << "Описание: " << records[i]->description << ", Сумма: " << records[i]->amount << std::endl;
-        }
+        std::ranges::for_each(records,  {
+            std::cout << "Описание: " << record->description << ", Сумма: " << record->amount << std::endl;
+        });
     }
 
     // Обновление записи
-    void updateRecord(int index, const std::string &newDescription, double newAmount)
+    void updateRecord(int index, std::string_view newDescription, double newAmount)
     {
         if (index >= 0 && index < records.size())
         {
@@ -105,7 +83,6 @@ public:
     {
         if (index >= 0 && index < records.size())
         {
-            delete records[index];
             records.erase(records.begin() + index);
         }
         else
@@ -118,18 +95,14 @@ public:
     double calculateTotalBalance() const
     {
         double total = 0;
-        for (size_t i = 0; i < records.size(); ++i)
-        {
-            total += records[i]->amount;
-        }
+        std::ranges::for_each(records, &total {
+            total += record->amount;
+        });
         return total;
     }
 
     // Освобождение памяти
-    ~FinanceManager()
-    {
-        clearRecords();
-    }
+    ~FinanceManager() = default;
 };
 
 int main()
