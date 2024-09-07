@@ -1,160 +1,138 @@
 #include <iostream>
 #include <vector>
-#include <string>
 #include <memory>
-#include <string_view>
-#include <algorithm>
+#include <string>
 
+// Класс для записи финансов
 class FinanceRecord
 {
 public:
+    FinanceRecord(const std::string &description, double amount)
+        : description(description), amount(amount) {}
+
+    void display() const
+    {
+        std::cout << "Description: " << description << ", Amount: " << amount << std::endl;
+    }
+
+    double getAmount() const
+    {
+        return amount;
+    }
+
+private:
     std::string description;
     double amount;
-
-    FinanceRecord(std::string_view desc, double amt) : description(desc), amount(amt) {}
 };
 
-class FinanceManager
+// Класс для сервиса контроля финансов
+class FinanceService
 {
-private:
-    std::vector<std::unique_ptr<FinanceRecord>> records;
-
 public:
-    // Конструктор по умолчанию
-    FinanceManager() = default;
-
-    // Копирующий конструктор
-    FinanceManager(const FinanceManager &other)
-    {
-        std::ranges::for_each(other.records, this {
-            records.push_back(std::make_unique<FinanceRecord>(*record));
-        });
-    }
-
-    // Оператор присваивания копированием
-    FinanceManager &operator=(const FinanceManager &other)
-    {
-        if (this != &other)
-        {
-            records.clear();
-            std::ranges::for_each(other.records, this {
-                records.push_back(std::make_unique<FinanceRecord>(*record));
-            });
-        }
-        return *this;
-    }
-
-    // Конструктор перемещения
-    FinanceManager(FinanceManager &&other) noexcept = default;
-
-    // Оператор присваивания перемещением
-    FinanceManager &operator=(FinanceManager &&other) noexcept = default;
-
-    // Добавление записи
-    void addRecord(std::string_view description, double amount)
+    // Создание записи
+    void createRecord(const std::string &description, double amount)
     {
         records.push_back(std::make_unique<FinanceRecord>(description, amount));
     }
 
-    // Отображение записей
-    void displayRecords() const
+    // Чтение всех записей
+    void readRecords() const
     {
-        std::ranges::for_each(records,  {
-            std::cout << "Описание: " << record->description << ", Сумма: " << record->amount << std::endl;
-        });
+        for (const auto &record : records)
+        {
+            record->display();
+        }
     }
 
     // Обновление записи
-    void updateRecord(int index, std::string_view newDescription, double newAmount)
+    void updateRecord(size_t index, const std::string &description, double amount)
     {
-        if (index >= 0 && index < records.size())
+        if (index < records.size())
         {
-            records[index]->description = newDescription;
-            records[index]->amount = newAmount;
+            records[index] = std::make_unique<FinanceRecord>(description, amount);
         }
         else
         {
-            std::cout << "Неправильный индекс!" << std::endl;
+            std::cerr << "Invalid index!" << std::endl;
         }
     }
 
     // Удаление записи
-    void deleteRecord(int index)
+    void deleteRecord(size_t index)
     {
-        if (index >= 0 && index < records.size())
+        if (index < records.size())
         {
             records.erase(records.begin() + index);
         }
         else
         {
-            std::cout << "Неправильный индекс!" << std::endl;
+            std::cerr << "Invalid index!" << std::endl;
         }
     }
 
-    // Итоговый баланс
+    // "Интересный" метод: подсчет общего баланса
     double calculateTotalBalance() const
     {
         double total = 0;
-        std::ranges::for_each(records, &total {
-            total += record->amount;
-        });
+        for (const auto &record : records)
+        {
+            total += record->getAmount();
+        }
         return total;
     }
 
-    // Освобождение памяти
-    ~FinanceManager() = default;
+private:
+    std::vector<std::unique_ptr<FinanceRecord>> records;
 };
 
 int main()
 {
-    FinanceManager manager;
+    FinanceService service;
     int choice;
     std::string description;
     double amount;
-    int index;
+    size_t index;
 
     do
     {
-        std::cout << "1. Добавить запись\n2. Список записей\n3. Обновить записи\n4. Удалить запись\n5. Показать баланс\n0. Выход\n";
-        std::cout << "Ваш выбор: ";
+        std::cout << "1. Create Record\n2. Read Records\n3. Update Record\n4. Delete Record\n5. Calculate Total Balance\n0. Exit\n";
+        std::cout << "Enter your choice: ";
         std::cin >> choice;
 
         switch (choice)
         {
         case 1:
-            std::cout << "Введите описание: ";
-            std::cin.ignore();
-            std::getline(std::cin, description);
-            std::cout << "Введите сумму: ";
+            std::cout << "Enter description: ";
+            std::cin >> description;
+            std::cout << "Enter amount: ";
             std::cin >> amount;
-            manager.addRecord(description, amount);
+            service.createRecord(description, amount);
             break;
         case 2:
-            manager.displayRecords();
+            service.readRecords();
             break;
         case 3:
-            std::cout << "Введите индекс для обновления: ";
+            std::cout << "Enter index: ";
             std::cin >> index;
-            std::cout << "Введите новое описание: ";
-            std::cin.ignore();
-            std::getline(std::cin, description);
-            std::cout << "Введите новую сумму: ";
+            std::cout << "Enter new description: ";
+            std::cin >> description;
+            std::cout << "Enter new amount: ";
             std::cin >> amount;
-            manager.updateRecord(index, description, amount);
+            service.updateRecord(index, description, amount);
             break;
         case 4:
-            std::cout << "Введите индекс для удаления: ";
+            std::cout << "Enter index: ";
             std::cin >> index;
-            manager.deleteRecord(index);
+            service.deleteRecord(index);
             break;
         case 5:
-            std::cout << "Итого: " << manager.calculateTotalBalance() << std::endl;
+            std::cout << "Total Balance: " << service.calculateTotalBalance() << std::endl;
             break;
         case 0:
-            std::cout << "Выход..." << std::endl;
+            std::cout << "Exiting..." << std::endl;
             break;
         default:
-            std::cout << "Неправильный выбор!" << std::endl;
+            std::cerr << "Invalid choice!" << std::endl;
         }
     } while (choice != 0);
 
