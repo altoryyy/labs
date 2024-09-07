@@ -17,22 +17,22 @@ private:
     std::vector<FinanceRecord *> records;
 
 public:
-    // С
+    // Create
     void addRecord(const std::string &description, double amount)
     {
         records.push_back(new FinanceRecord(description, amount));
     }
 
-    // R
+    // Read
     void displayRecords() const
     {
         for (size_t i = 0; i < records.size(); ++i)
         {
-            std::cout << "Описание: " << records[i]->description << ", Сумма: " << records[i]->amount << std::endl;
+            std::cout << "Description: " << records[i]->description << ", Amount: " << records[i]->amount << std::endl;
         }
     }
 
-    // U
+    // Update
     void updateRecord(int index, const std::string &newDescription, double newAmount)
     {
         if (index >= 0 && index < records.size())
@@ -42,11 +42,11 @@ public:
         }
         else
         {
-            std::cout << "Неправильный индекс!" << std::endl;
+            std::cout << "Invalid index!" << std::endl;
         }
     }
 
-    // D
+    // Delete
     void deleteRecord(int index)
     {
         if (index >= 0 && index < records.size())
@@ -56,11 +56,11 @@ public:
         }
         else
         {
-            std::cout << "Неправильный индекс!" << std::endl;
+            std::cout << "Invalid index!" << std::endl;
         }
     }
 
-    // итоговый баланс
+    // Calculate total balance
     double calculateTotalBalance() const
     {
         double total = 0;
@@ -71,7 +71,7 @@ public:
         return total;
     }
 
-    // освобождение памяти
+    // Destructor to free dynamically allocated memory
     ~FinanceManager()
     {
         for (size_t i = 0; i < records.size(); ++i)
@@ -91,17 +91,17 @@ int main()
 
     do
     {
-        std::cout << "1. Добавить запись\n2. Список записей\n3. Обновить записи\n4. Удалить запись\n5. Показать баланс\n0. Выход\n";
-        std::cout << "Ваш выбор: ";
+        std::cout << "1. Add Record\n2. Display Records\n3. Update Record\n4. Delete Record\n5. Calculate Total Balance\n0. Exit\n";
+        std::cout << "Enter your choice: ";
         std::cin >> choice;
 
         switch (choice)
         {
         case 1:
-            std::cout << "Введите описание: ";
+            std::cout << "Enter description: ";
             std::cin.ignore();
             std::getline(std::cin, description);
-            std::cout << "Введите суммуt: ";
+            std::cout << "Enter amount: ";
             std::cin >> amount;
             manager.addRecord(description, amount);
             break;
@@ -109,30 +109,31 @@ int main()
             manager.displayRecords();
             break;
         case 3:
-            std::cout << "Введите индекс для обновления: ";
+            std::cout << "Enter index to update: ";
             std::cin >> index;
-            std::cout << "Введите новое описание: ";
+            std::cout << "Enter new description: ";
             std::cin.ignore();
             std::getline(std::cin, description);
-            std::cout << "Введите новую сумму: ";
+            std::cout << "Enter new amount: ";
             std::cin >> amount;
             manager.updateRecord(index, description, amount);
             break;
         case 4:
-            std::cout << "Введите индекс для удаления: ";
+            std::cout << "Enter index to delete: ";
             std::cin >> index;
             manager.deleteRecord(index);
             break;
         case 5:
-            std::cout << "Итого: " << manager.calculateTotalBalance() << std::endl;
+            std::cout << "Total Balance: " << manager.calculateTotalBalance() << std::endl;
             break;
         case 0:
-            std::cout << "Выход..." << std::endl;
+            std::cout << "Exiting..." << std::endl;
             break;
         default:
-            std::cout << "Неправильный выбор!" << std::endl;
+            std::cout << "Invalid choice!" << std::endl;
         }
     } while (choice != 0);
 
     return 0;
 }
+
