@@ -7,13 +7,11 @@
 class FinanceService
 {
 public:
-    // Создание записи
     void createRecord(const std::string &description, double amount)
     {
         records.push_back(std::make_unique<FinanceRecord>(description, amount));
     }
 
-    // Чтение всех записей
     void readRecords() const
     {
         for (const auto &record : records)
@@ -22,7 +20,6 @@ public:
         }
     }
 
-    // Обновление записи
     void updateRecord(size_t index, const std::string &description, double amount)
     {
         if (index < records.size())
@@ -35,7 +32,6 @@ public:
         }
     }
 
-    // Удаление записи
     void deleteRecord(size_t index)
     {
         if (index < records.size())
