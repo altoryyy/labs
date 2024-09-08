@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "Finance.cpp"
+#include "FinanceClass.cpp"
 
 int main()
 {
