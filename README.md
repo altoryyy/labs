@@ -10,7 +10,7 @@
 Создание бюджета
 Анализ финансов
 Напоминания о платежах
-Цели и сбережения
+Цели и сбережения и т.д.
 
-
+SonarCloud
 https://sonarcloud.io/summary/new_code?id=altoryyy_labs
