@@ -26,4 +26,4 @@
     + Автоматический пересчет валют по текущему курсу.
 
 
-### SonarCloud: https://sonarcloud.io/summary/new_code?id=altoryyy_labs
+### SonarCloud: https://sonarcloud.io/project/overview?id=altoryyy_labs
