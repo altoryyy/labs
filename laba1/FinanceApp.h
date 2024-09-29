@@ -1,10 +1,10 @@
 #ifndef FINANCEAPP_H
 #define FINANCEAPP_H
 
-#include <string>
+#include <iostream>
 #include <vector>
 #include <memory>
-#include <iostream>
+#include <string>
 
 class FinanceRecord
 {
