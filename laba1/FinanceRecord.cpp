@@ -1,25 +1,14 @@
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <string>
+#include "FinanceApp.h"
 
-class FinanceRecord
+FinanceRecord::FinanceRecord(const std::string &description, double amount)
+    : description(description), amount(amount) {}
+
+void FinanceRecord::display() const
 {
-public:
-    FinanceRecord(const std::string &description, double amount)
-        : description(description), amount(amount) {}
+    std::cout << "Description: " << description << ", Amount: " << amount << std::endl;
+}
 
-    void display() const
-    {
-        std::cout << "Description: " << description << ", Amount: " << amount << std::endl;
-    }
-
-    double getAmount() const
-    {
-        return amount;
-    }
-
-private:
-    std::string description;
-    double amount;
-};
+double FinanceRecord::getAmount() const
+{
+    return amount;
+}

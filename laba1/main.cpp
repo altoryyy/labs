@@ -1,8 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <string>
-#include "FinanceService.cpp"
+#include "FinanceApp.h"
 
 int main()
 {

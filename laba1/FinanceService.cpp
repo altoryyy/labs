@@ -1,59 +1,48 @@
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <string>
-#include "FinanceRecord.cpp"
+#include "FinanceApp.h"
 
-class FinanceService
+void FinanceService::createRecord(const std::string &description, double amount)
 {
-public:
-    void createRecord(const std::string &description, double amount)
-    {
-        records.push_back(std::make_unique<FinanceRecord>(description, amount));
-    }
+    records.push_back(std::make_unique<FinanceRecord>(description, amount));
+}
 
-    void readRecords() const
+void FinanceService::readRecords() const
+{
+    for (const auto &record : records)
     {
-        for (const auto &record : records)
-        {
-            record->display();
-        }
+        record->display();
     }
+}
 
-    void updateRecord(size_t index, const std::string &description, double amount)
+void FinanceService::updateRecord(size_t index, const std::string &description, double amount)
+{
+    if (index < records.size())
     {
-        if (index < records.size())
-        {
-            records[index] = std::make_unique<FinanceRecord>(description, amount);
-        }
-        else
-        {
-            std::cerr << "Invalid index!" << std::endl;
-        }
+        records[index] = std::make_unique<FinanceRecord>(description, amount);
     }
-
-    void deleteRecord(size_t index)
+    else
     {
-        if (index < records.size())
-        {
-            records.erase(records.begin() + index);
-        }
-        else
-        {
-            std::cerr << "Invalid index!" << std::endl;
-        }
+        std::cerr << "Invalid index!" << std::endl;
     }
+}
 
-    double calculateTotalBalance() const
+void FinanceService::deleteRecord(size_t index)
+{
+    if (index < records.size())
     {
-        double total = 0;
-        for (const auto &record : records)
-        {
-            total += record->getAmount();
-        }
-        return total;
+        records.erase(records.begin() + index);
     }
+    else
+    {
+        std::cerr << "Invalid index!" << std::endl;
+    }
+}
 
-private:
-    std::vector<std::unique_ptr<FinanceRecord>> records;
-};
+double FinanceService::calculateTotalBalance() const
+{
+    double total = 0;
+    for (const auto &record : records)
+    {
+        total += record->getAmount();
+    }
+    return total;
+}
