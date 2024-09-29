@@ -3,7 +3,7 @@
 
 void FinanceService::createRecord(const std::string &description, double amount)
 {
-    records.push_back(std::unique_ptr<FinanceRecord>(new FinanceRecord(description, amount)));
+    records.push_back(std::make_unique<FinanceRecord>(description, amount));
 }
 
 void FinanceService::readRecords() const
@@ -18,7 +18,7 @@ void FinanceService::updateRecord(size_t index, const std::string &description, 
 {
     if (index < records.size())
     {
-        records[index] = std::unique_ptr<FinanceRecord>(new FinanceRecord(description, amount));
+        records[index] = std::make_unique<FinanceRecord>(description, amount);
     }
     else
     {
