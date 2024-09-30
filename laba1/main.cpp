@@ -1,6 +1,5 @@
-#include "FinanceApp.h"
+#include "headers/FinanceService.h"
 #include "FinanceService.cpp"
-
 int main()
 {
     FinanceService service;

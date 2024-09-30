@@ -1,4 +1,4 @@
-#include "FinanceApp.h"
+#include "headers/FinanceRecord.h"
 
 FinanceRecord::FinanceRecord(const std::string &description, double amount)
     : description(description), amount(amount) {}
