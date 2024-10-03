@@ -1,5 +1,5 @@
 #include "headers/FinanceRecord.h"
-
+sdadsa
 FinanceRecord::FinanceRecord(const std::string &description, double amount)
     : description(description), amount(amount) {}
 
