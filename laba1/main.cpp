@@ -1,5 +1,6 @@
 #include "headers/FinanceService.h"
 #include "FinanceService.cpp"
+
 int main()
 {
     FinanceService service;
@@ -7,6 +8,8 @@ int main()
     std::string description;
     double amount;
     size_t index;
+
+    std::cout << std::fixed << std::setprecision(2);
 
     do
     {
