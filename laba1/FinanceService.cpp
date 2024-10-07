@@ -1,49 +1,163 @@
 #include "headers/FinanceService.h"
 #include "FinanceRecord.cpp"
 
+FinanceService::FinanceService()
+{
+    openDatabase();
+}
+
+FinanceService::~FinanceService()
+{
+    closeDatabase();
+}
+
+void FinanceService::openDatabase()
+{
+    if (sqlite3_open("Records.db", &db))
+    {
+        std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
+    }
+    else
+    {
+        std::cout << "Opened database successfully" << std::endl;
+
+        // Создаем таблицу, если она не существует
+        const char *sql = "CREATE TABLE IF NOT EXISTS FinanceRecords (ID INTEGER PRIMARY KEY AUTOINCREMENT, Description TEXT, Amount REAL);";
+        char *errMsg = 0;
+        if (sqlite3_exec(db, sql, 0, 0, &errMsg) != SQLITE_OK)
+        {
+            std::cerr << "SQL error: " << errMsg << std::endl;
+            sqlite3_free(errMsg);
+        }
+    }
+}
+
+void FinanceService::closeDatabase()
+{
+    sqlite3_close(db);
+}
+
 void FinanceService::createRecord(const std::string &description, double amount)
 {
-    records.push_back(std::make_unique<FinanceRecord>(description, amount));
+    std::string sql = "INSERT INTO FinanceRecords (Description, Amount) VALUES ('" + description + "', " + std::to_string(amount) + ");";
+    char *errMsg = 0;
+    if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg) != SQLITE_OK)
+    {
+        std::cerr << "SQL error: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
+    }
 }
 
 void FinanceService::readRecords() const
 {
-    for (const auto &record : records)
+    const char *sql = "SELECT ID, Description, Amount FROM FinanceRecords;";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     {
-        record->display();
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int id = sqlite3_column_int(stmt, 0);
+        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        double amount = sqlite3_column_double(stmt, 2);
+        FinanceRecord record(description, amount, id);
+        record.display();
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+void FinanceService::updateRecord(int id, const std::string &description, double amount)
+{
+    std::string sql = "UPDATE FinanceRecords SET Description = '" + description + "', Amount = " + std::to_string(amount) + " WHERE ID = " + std::to_string(id) + ";";
+    char *errMsg = 0;
+    if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg) != SQLITE_OK)
+    {
+        std::cerr << "SQL error: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
     }
 }
 
-void FinanceService::updateRecord(size_t index, const std::string &description, double amount)
+void FinanceService::deleteRecord(int id)
 {
-    if (index < records.size())
+    std::string sql = "DELETE FROM FinanceRecords WHERE ID = " + std::to_string(id) + ";";
+    char *errMsg = 0;
+    if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg) != SQLITE_OK)
     {
-        records[index] = std::make_unique<FinanceRecord>(description, amount);
-    }
-    else
-    {
-        std::cerr << "Invalid index!" << std::endl;
-    }
-}
-
-void FinanceService::deleteRecord(size_t index)
-{
-    if (index < records.size())
-    {
-        records.erase(records.begin() + index);
-    }
-    else
-    {
-        std::cerr << "Invalid index!" << std::endl;
+        std::cerr << "SQL error: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
     }
 }
 
 double FinanceService::calculateTotalBalance() const
 {
     double total = 0;
-    for (const auto &record : records)
+    const char *sql = "SELECT SUM(Amount) FROM FinanceRecords;";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     {
-        total += record->getAmount();
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return total;
     }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        total = sqlite3_column_double(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
     return total;
+}
+
+void FinanceService::clearRecords()
+{
+    char *errMsg = 0;
+    const char *sqlDelete = "DELETE FROM FinanceRecords;";
+    const char *sqlReset = "DELETE FROM sqlite_sequence WHERE name='FinanceRecords';"; // Сброс счетчика
+
+    if (sqlite3_exec(db, sqlDelete, 0, 0, &errMsg) != SQLITE_OK)
+    {
+        std::cerr << "SQL error: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
+    }
+
+    if (sqlite3_exec(db, sqlReset, 0, 0, &errMsg) != SQLITE_OK)
+    {
+        std::cerr << "SQL error: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
+    }
+}
+
+FinanceRecord FinanceService::getRecordById(int id) const
+{
+    FinanceRecord record("", 0.0, id); // Пустая запись для начала
+    const char *sql = "SELECT Description, Amount FROM FinanceRecords WHERE ID = ?;";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
+    {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return record; // Возвращаем пустую запись
+    }
+
+    sqlite3_bind_int(stmt, 1, id); // Привязываем ID к запросу
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
+        double amount = sqlite3_column_double(stmt, 1);
+        record = FinanceRecord(description, amount, id); // Заполняем запись
+    }
+    else
+    {
+        std::cerr << "No record found with ID: " << id << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    return record;
 }

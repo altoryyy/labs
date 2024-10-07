@@ -1,24 +1,29 @@
 #ifndef FINANCESERVICE_H
 #define FINANCESERVICE_H
 
-#include <iostream>
-#include <vector>
-#include <memory>
 #include <string>
-#include <iomanip>
+#include <iostream>
+#include <sqlite3.h>
 #include "FinanceRecord.h"
 
 class FinanceService
 {
+    sqlite3 *db;
+
 public:
+    FinanceService();
+    ~FinanceService();
+
     void createRecord(const std::string &description, double amount);
     void readRecords() const;
-    void updateRecord(size_t index, const std::string &description, double amount);
-    void deleteRecord(size_t index);
+    void updateRecord(int id, const std::string &description, double amount);
+    void deleteRecord(int id);
     double calculateTotalBalance() const;
+    void clearRecords();
+    FinanceRecord getRecordById(int id) const; // Прототип нового метода
 
-private:
-    std::vector<std::unique_ptr<FinanceRecord>> records;
+    inline void openDatabase();
+    inline void closeDatabase();
 };
 
-#endif
+#endif // FINANCESERVICE_H
