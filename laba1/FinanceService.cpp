@@ -1,5 +1,6 @@
 #include "headers/FinanceService.h"
 #include "FinanceRecord.cpp"
+#include <format> // Make sure to include this for std::format
 
 FinanceService::FinanceService()
 {
@@ -23,8 +24,8 @@ void FinanceService::openDatabase()
 
         // Создаем таблицу, если она не существует
         const char *sql = "CREATE TABLE IF NOT EXISTS FinanceRecords (ID INTEGER PRIMARY KEY AUTOINCREMENT, Description TEXT, Amount REAL);";
-        char *errMsg = 0;
-        if (sqlite3_exec(db, sql, 0, 0, &errMsg) != SQLITE_OK)
+        char *errMsg = nullptr;
+        if (sqlite3_exec(db, sql, nullptr, nullptr, &errMsg) != SQLITE_OK)
         {
             std::cerr << "SQL error: " << errMsg << std::endl;
             sqlite3_free(errMsg);
@@ -39,9 +40,9 @@ void FinanceService::closeDatabase()
 
 void FinanceService::createRecord(const std::string &description, double amount)
 {
-    std::string sql = "INSERT INTO FinanceRecords (Description, Amount) VALUES ('" + description + "', " + std::to_string(amount) + ");";
-    char *errMsg = 0;
-    if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg) != SQLITE_OK)
+    std::string sql = std::format("INSERT INTO FinanceRecords (Description, Amount) VALUES ('{}', {});", description, amount);
+    char *errMsg = nullptr;
+    if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK)
     {
         std::cerr << "SQL error: " << errMsg << std::endl;
         sqlite3_free(errMsg);
@@ -73,9 +74,10 @@ void FinanceService::readRecords() const
 
 void FinanceService::updateRecord(int id, const std::string &description, double amount)
 {
-    std::string sql = "UPDATE FinanceRecords SET Description = '" + description + "', Amount = " + std::to_string(amount) + " WHERE ID = " + std::to_string(id) + ";";
-    char *errMsg = 0;
-    if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg) != SQLITE_OK)
+    std::string sql = std::format("UPDATE FinanceRecords SET Description = '{}', Amount = {} WHERE ID = {};",
+                                  description, amount, id);
+    char *errMsg = nullptr;
+    if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK)
     {
         std::cerr << "SQL error: " << errMsg << std::endl;
         sqlite3_free(errMsg);
@@ -84,9 +86,9 @@ void FinanceService::updateRecord(int id, const std::string &description, double
 
 void FinanceService::deleteRecord(int id)
 {
-    std::string sql = "DELETE FROM FinanceRecords WHERE ID = " + std::to_string(id) + ";";
-    char *errMsg = 0;
-    if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMsg) != SQLITE_OK)
+    std::string sql = std::format("DELETE FROM FinanceRecords WHERE ID = {}; ", id);
+    char *errMsg = nullptr;
+    if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK)
     {
         std::cerr << "SQL error: " << errMsg << std::endl;
         sqlite3_free(errMsg);
@@ -116,17 +118,17 @@ double FinanceService::calculateTotalBalance() const
 
 void FinanceService::clearRecords()
 {
-    char *errMsg = 0;
+    char *errMsg = nullptr;
     const char *sqlDelete = "DELETE FROM FinanceRecords;";
     const char *sqlReset = "DELETE FROM sqlite_sequence WHERE name='FinanceRecords';"; // Сброс счетчика
 
-    if (sqlite3_exec(db, sqlDelete, 0, 0, &errMsg) != SQLITE_OK)
+    if (sqlite3_exec(db, sqlDelete, nullptr, nullptr, &errMsg) != SQLITE_OK)
     {
         std::cerr << "SQL error: " << errMsg << std::endl;
         sqlite3_free(errMsg);
     }
 
-    if (sqlite3_exec(db, sqlReset, 0, 0, &errMsg) != SQLITE_OK)
+    if (sqlite3_exec(db, sqlReset, nullptr, nullptr, &errMsg) != SQLITE_OK)
     {
         std::cerr << "SQL error: " << errMsg << std::endl;
         sqlite3_free(errMsg);
