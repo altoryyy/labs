@@ -3,7 +3,7 @@
 #include <format>
 
 // Constructor
-FinanceService::FinanceService() : db(nullptr)
+FinanceService::FinanceService()
 {
     openDatabase();
 }
@@ -15,7 +15,7 @@ FinanceService::~FinanceService()
 }
 
 // Copy constructor
-FinanceService::FinanceService(const FinanceService &other) : db(nullptr)
+FinanceService::FinanceService(const FinanceService &other)
 {
     if (other.db)
     {

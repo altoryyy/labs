@@ -10,7 +10,7 @@
 class FinanceService
 {
 private:
-    sqlite3 *db;
+    sqlite3 *db = nullptr; // In-class initializer
 
 public:
     FinanceService();
