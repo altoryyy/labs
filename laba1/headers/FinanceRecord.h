@@ -20,7 +20,11 @@ public:
     int getId() const;
 
     // Дружественные функции для перегрузки операторов
-    friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
+    friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs)
+    {
+        return lhs.description == rhs.description && lhs.amount == rhs.amount;
+    }
+
     friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs)
     {
         return FinanceRecord(lhs.description + " & " + rhs.description, lhs.amount + rhs.amount, 1);
@@ -29,7 +33,11 @@ public:
     {
         return FinanceRecord(lhs.description + " - " + rhs.description, lhs.amount - rhs.amount, 1);
     }
-    friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record);
+    friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record)
+    {
+        os << "ID: " << record.id << ", Description: " << record.description << ", Amount: " << record.amount;
+        return os;
+    }
 };
 
 #endif // FINANCERECORD_H
