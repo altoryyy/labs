@@ -20,10 +20,10 @@ public:
     int getId() const;
 
     // Объявление дружественных функций для перегрузки операторов
-    friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
-    friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs);
-    friend FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs);
-    friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record);
+    friend inline bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
+    inline friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs);
+    inline friend FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs);
+    inline friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record);
 };
 
 #endif // FINANCERECORD_H
