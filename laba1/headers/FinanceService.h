@@ -9,11 +9,24 @@
 
 class FinanceService
 {
+private:
     sqlite3 *db;
 
 public:
     FinanceService();
     ~FinanceService();
+
+    // Copy constructor
+    FinanceService(const FinanceService &other);
+
+    // Move constructor
+    FinanceService(FinanceService &&other) noexcept;
+
+    // Copy assignment operator
+    FinanceService &operator=(const FinanceService &other);
+
+    // Move assignment operator
+    FinanceService &operator=(FinanceService &&other) noexcept;
 
     void createRecord(const std::string &description, double amount);
     void readRecords() const;
