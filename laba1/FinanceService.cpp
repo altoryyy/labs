@@ -1,6 +1,6 @@
 #include "headers/FinanceService.h"
 #include "FinanceRecord.cpp"
-#include <format> // Make sure to include this for std::format
+#include <format>
 
 FinanceService::FinanceService()
 {
@@ -22,7 +22,6 @@ void FinanceService::openDatabase()
     {
         std::cout << "Opened database successfully" << std::endl;
 
-        // Создаем таблицу, если она не существует
         const char *sql = "CREATE TABLE IF NOT EXISTS FinanceRecords (ID INTEGER PRIMARY KEY AUTOINCREMENT, Description TEXT, Amount REAL);";
         char *errMsg = nullptr;
         if (sqlite3_exec(db, sql, nullptr, nullptr, &errMsg) != SQLITE_OK)
@@ -120,7 +119,7 @@ void FinanceService::clearRecords()
 {
     char *errMsg = nullptr;
     const char *sqlDelete = "DELETE FROM FinanceRecords;";
-    const char *sqlReset = "DELETE FROM sqlite_sequence WHERE name='FinanceRecords';"; // Сброс счетчика
+    const char *sqlReset = "DELETE FROM sqlite_sequence WHERE name='FinanceRecords';";
 
     if (sqlite3_exec(db, sqlDelete, nullptr, nullptr, &errMsg) != SQLITE_OK)
     {
@@ -137,23 +136,23 @@ void FinanceService::clearRecords()
 
 FinanceRecord FinanceService::getRecordById(int id) const
 {
-    FinanceRecord record("", 0.0, id); // Пустая запись для начала
+    FinanceRecord record("", 0.0, id);
     const char *sql = "SELECT Description, Amount FROM FinanceRecords WHERE ID = ?;";
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK)
     {
         std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
-        return record; // Возвращаем пустую запись
+        return record;
     }
 
-    sqlite3_bind_int(stmt, 1, id); // Привязываем ID к запросу
+    sqlite3_bind_int(stmt, 1, id);
 
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
         std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
         double amount = sqlite3_column_double(stmt, 1);
-        record = FinanceRecord(description, amount, id); // Заполняем запись
+        record = FinanceRecord(description, amount, id);
     }
     else
     {

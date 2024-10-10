@@ -20,28 +20,27 @@ std::string FinanceRecord::getDescription() const
 
 int FinanceRecord::getId() const
 {
-    return id; // Метод для получения ID
+    return id;
 }
 
-// Дружественная функция
+// Implementing operator overloads as friend functions
+bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs)
+{
+    return lhs.description == rhs.description && lhs.amount == rhs.amount;
+}
+
+FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs)
+{
+    return FinanceRecord(lhs.description + " & " + rhs.description, lhs.amount + rhs.amount, 1); // ID is arbitrary
+}
+
+FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs)
+{
+    return FinanceRecord(lhs.description + " - " + rhs.description, lhs.amount - rhs.amount, 1); // ID is arbitrary
+}
+
 std::ostream &operator<<(std::ostream &os, const FinanceRecord &record)
 {
     os << "ID: " << record.id << ", Description: " << record.description << ", Amount: " << record.amount;
     return os;
-}
-
-// Перегрузка операторов
-bool FinanceRecord::operator==(const FinanceRecord &other) const
-{
-    return description == other.description && amount == other.amount;
-}
-
-FinanceRecord FinanceRecord::operator+(const FinanceRecord &other) const
-{
-    return FinanceRecord(description + " & " + other.description, amount + other.amount, 1); // ID не имеет значения при сложении
-}
-
-FinanceRecord FinanceRecord::operator-(const FinanceRecord &other) const
-{
-    return FinanceRecord(description + " - " + other.description, amount - other.amount, 1); // ID не имеет значения при вычитании
 }

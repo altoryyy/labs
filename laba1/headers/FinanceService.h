@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sqlite3.h>
 #include "FinanceRecord.h"
+#include <iomanip>
 
 class FinanceService
 {
@@ -20,10 +21,10 @@ public:
     void deleteRecord(int id);
     double calculateTotalBalance() const;
     void clearRecords();
-    FinanceRecord getRecordById(int id) const; // Прототип нового метода
+    FinanceRecord getRecordById(int id) const;
 
-    inline void openDatabase();
-    inline void closeDatabase();
+    void openDatabase();
+    void closeDatabase();
 };
 
-#endif // FINANCESERVICE_H
+#endif

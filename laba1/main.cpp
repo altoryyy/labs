@@ -1,13 +1,14 @@
 #include "headers/FinanceService.h"
 #include "FinanceService.cpp"
-#include <iomanip>
+
 int main() // cd "/Users/artemlopatin/уник/labs/laba1/src/" && g++ -std=c++20 main.cpp -o main -lsqlite3 && "/Users/artemlopatin/уник/lабs/laba1/src/"main
 {
     FinanceService service;
     int choice;
     std::string description;
     double amount;
-    int id1, id2;
+    int id1;
+    int id2;
 
     std::cout << std::fixed << std::setprecision(2);
 
@@ -63,7 +64,6 @@ int main() // cd "/Users/artemlopatin/уник/labs/laba1/src/" && g++ -std=c++2
             break;
         case 7:
         {
-            // Сравнение двух записей
             std::cout << "Enter ID of the first record to compare: ";
             std::cin >> id1;
             std::cout << "Enter ID of the second record to compare: ";
@@ -84,7 +84,6 @@ int main() // cd "/Users/artemlopatin/уник/labs/laba1/src/" && g++ -std=c++2
         }
         case 8:
         {
-            // Сложение двух записей
             std::cout << "Enter ID of the first record to add: ";
             std::cin >> id1;
             std::cout << "Enter ID of the second record to add: ";
@@ -99,7 +98,6 @@ int main() // cd "/Users/artemlopatin/уник/labs/laba1/src/" && g++ -std=c++2
         }
         case 9:
         {
-            // Вычитание двух записей
             std::cout << "Enter ID of the first record to subtract: ";
             std::cin >> id1;
             std::cout << "Enter ID of the second record to subtract: ";

@@ -6,25 +6,24 @@
 
 class FinanceRecord
 {
+private:
     std::string description;
     double amount;
-    int id; // Поле для хранения ID
+    int id;
 
 public:
-    FinanceRecord(const std::string &description, double amount, int id); // Конструктор с тремя параметрами
+    FinanceRecord(const std::string &description, double amount, int id);
 
     void display() const;
     double getAmount() const;
     std::string getDescription() const;
-    int getId() const; // Новый геттер для ID
+    int getId() const;
 
-    // Дружественная функция
+    // Friend functions for operator overloading
+    friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
+    friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs);
+    friend FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs);
     friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record);
-
-    // Перегрузка операторов
-    bool operator==(const FinanceRecord &other) const;
-    FinanceRecord operator+(const FinanceRecord &other) const;
-    FinanceRecord operator-(const FinanceRecord &other) const;
 };
 
-#endif // FINANCERECORD_H
+#endif
