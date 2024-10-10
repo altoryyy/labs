@@ -19,7 +19,6 @@ public:
     std::string getDescription() const;
     int getId() const;
 
-    // Дружественные функции для перегрузки операторов
     friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs)
     {
         return lhs.description == rhs.description && lhs.amount == rhs.amount;
@@ -40,4 +39,4 @@ public:
     }
 };
 
-#endif // FINANCERECORD_H
+#endif

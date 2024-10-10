@@ -22,5 +22,3 @@ int FinanceRecord::getId() const
 {
     return id;
 }
-
-// Определение оператора =

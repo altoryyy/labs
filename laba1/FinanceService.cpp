@@ -2,67 +2,58 @@
 #include "FinanceRecord.cpp"
 #include <format>
 
-// Constructor
 FinanceService::FinanceService()
 {
     openDatabase();
 }
 
-// Destructor
 FinanceService::~FinanceService()
 {
     closeDatabase();
 }
 
-// Copy constructor
 FinanceService::FinanceService(const FinanceService &other)
 {
     if (other.db)
     {
-        sqlite3_open("Records.db", &db); // Open new connection
-        // Additional logic can be added here if needed
+        sqlite3_open("Records.db", &db);
     }
 }
 
-// Move constructor
 FinanceService::FinanceService(FinanceService &&other) noexcept : db(other.db)
 {
-    other.db = nullptr; // Leave other in a safe state
+    other.db = nullptr;
 }
 
-// Copy assignment operator
 FinanceService &FinanceService::operator=(const FinanceService &other)
 {
     if (this != &other)
     {
-        closeDatabase(); // Clean up existing resource
+        closeDatabase();
 
         if (other.db)
         {
-            sqlite3_open("Records.db", &db); // Open new connection
-            // Additional copying logic can be added here if needed
+            sqlite3_open("Records.db", &db);
         }
         else
         {
-            db = nullptr; // Ensure db is null if other.db is null
+            db = nullptr;
         }
     }
     return *this;
 }
 
-// Move assignment operator
 FinanceService &FinanceService::operator=(FinanceService &&other) noexcept
 {
     if (this != &other)
     {
-        closeDatabase();    // Clean up existing resource
-        db = other.db;      // Transfer ownership
-        other.db = nullptr; // Leave other in a safe state
+        closeDatabase();
+        db = other.db;
+        other.db = nullptr;
     }
     return *this;
 }
 
-// Open database connection
 void FinanceService::openDatabase()
 {
     if (sqlite3_open("Records.db", &db))
@@ -83,17 +74,15 @@ void FinanceService::openDatabase()
     }
 }
 
-// Close database connection
 void FinanceService::closeDatabase()
 {
     if (db)
     {
         sqlite3_close(db);
-        db = nullptr; // Ensure db is set to nullptr after closing
+        db = nullptr;
     }
 }
 
-// Create a new record
 void FinanceService::createRecord(const std::string &description, double amount)
 {
     std::string sql = std::format("INSERT INTO FinanceRecords (Description, Amount) VALUES ('{}', {});", description, amount);
@@ -105,7 +94,6 @@ void FinanceService::createRecord(const std::string &description, double amount)
     }
 }
 
-// Read all records
 void FinanceService::readRecords() const
 {
     const char *sql = "SELECT ID, Description, Amount FROM FinanceRecords;";
@@ -129,7 +117,6 @@ void FinanceService::readRecords() const
     sqlite3_finalize(stmt);
 }
 
-// Update a specific record
 void FinanceService::updateRecord(int id, const std::string &description, double amount)
 {
     std::string sql = std::format("UPDATE FinanceRecords SET Description = '{}', Amount = {} WHERE ID = {};",
@@ -142,7 +129,6 @@ void FinanceService::updateRecord(int id, const std::string &description, double
     }
 }
 
-// Delete a record by ID
 void FinanceService::deleteRecord(int id)
 {
     std::string sql = std::format("DELETE FROM FinanceRecords WHERE ID = {}; ", id);
@@ -154,7 +140,6 @@ void FinanceService::deleteRecord(int id)
     }
 }
 
-// Calculate the total balance
 double FinanceService::calculateTotalBalance() const
 {
     double total = 0;
@@ -176,7 +161,6 @@ double FinanceService::calculateTotalBalance() const
     return total;
 }
 
-// Clear all records from the database
 void FinanceService::clearRecords()
 {
     char *errMsg = nullptr;
@@ -196,7 +180,6 @@ void FinanceService::clearRecords()
     }
 }
 
-// Get a record by ID
 FinanceRecord FinanceService::getRecordById(int id) const
 {
     FinanceRecord record("", 0.0, id);
