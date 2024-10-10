@@ -23,22 +23,13 @@ int FinanceRecord::getId() const
     return id;
 }
 
-// Дружественные функции для перегрузки операторов
+// Определение оператора ==
 bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs)
 {
     return lhs.description == rhs.description && lhs.amount == rhs.amount;
 }
 
-FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs)
-{
-    return FinanceRecord(lhs.description + " & " + rhs.description, lhs.amount + rhs.amount, 1); // ID произвольный
-}
-
-FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs)
-{
-    return FinanceRecord(lhs.description + " - " + rhs.description, lhs.amount - rhs.amount, 1); // ID произвольный
-}
-
+// Определение оператора вывода
 std::ostream &operator<<(std::ostream &os, const FinanceRecord &record)
 {
     os << "ID: " << record.id << ", Description: " << record.description << ", Amount: " << record.amount;

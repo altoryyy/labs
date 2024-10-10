@@ -19,11 +19,17 @@ public:
     std::string getDescription() const;
     int getId() const;
 
-    // Объявление дружественных функций для перегрузки операторов
-    friend inline bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
-    inline friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs);
-    inline friend FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs);
-    inline friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record);
+    // Дружественные функции для перегрузки операторов
+    friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
+    friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs)
+    {
+        return FinanceRecord(lhs.description + " & " + rhs.description, lhs.amount + rhs.amount, 1);
+    }
+    friend FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs)
+    {
+        return FinanceRecord(lhs.description + " - " + rhs.description, lhs.amount - rhs.amount, 1);
+    }
+    friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record);
 };
 
 #endif // FINANCERECORD_H
