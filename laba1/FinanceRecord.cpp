@@ -23,7 +23,7 @@ int FinanceRecord::getId() const
     return id;
 }
 
-// Implementing operator overloads as hidden friends
+// Hidden friend functions for operator overloading
 bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs)
 {
     return lhs.description == rhs.description && lhs.amount == rhs.amount;

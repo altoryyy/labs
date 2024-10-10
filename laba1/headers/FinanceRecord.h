@@ -19,11 +19,11 @@ public:
     std::string getDescription() const;
     int getId() const;
 
-    // Friend functions for operator overloading
+    // Hidden friend functions for operator overloading
     friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
     friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs);
     friend FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs);
     friend std::ostream &operator<<(std::ostream &os, const FinanceRecord &record);
 };
 
-#endif
+#endif // FINANCERECORD_H
