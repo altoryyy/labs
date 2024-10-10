@@ -19,7 +19,7 @@ public:
     std::string getDescription() const;
     int getId() const;
 
-    // Hidden friend functions for operator overloading
+    // Объявление дружественных функций для перегрузки операторов
     friend bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs);
     friend FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs);
     friend FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs);

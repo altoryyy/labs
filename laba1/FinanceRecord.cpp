@@ -23,7 +23,7 @@ int FinanceRecord::getId() const
     return id;
 }
 
-// Hidden friend functions for operator overloading
+// Дружественные функции для перегрузки операторов
 bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs)
 {
     return lhs.description == rhs.description && lhs.amount == rhs.amount;
@@ -31,12 +31,12 @@ bool operator==(const FinanceRecord &lhs, const FinanceRecord &rhs)
 
 FinanceRecord operator+(const FinanceRecord &lhs, const FinanceRecord &rhs)
 {
-    return FinanceRecord(lhs.description + " & " + rhs.description, lhs.amount + rhs.amount, 1); // ID is arbitrary
+    return FinanceRecord(lhs.description + " & " + rhs.description, lhs.amount + rhs.amount, 1); // ID произвольный
 }
 
 FinanceRecord operator-(const FinanceRecord &lhs, const FinanceRecord &rhs)
 {
-    return FinanceRecord(lhs.description + " - " + rhs.description, lhs.amount - rhs.amount, 1); // ID is arbitrary
+    return FinanceRecord(lhs.description + " - " + rhs.description, lhs.amount - rhs.amount, 1); // ID произвольный
 }
 
 std::ostream &operator<<(std::ostream &os, const FinanceRecord &record)
