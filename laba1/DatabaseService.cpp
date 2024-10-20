@@ -3,11 +3,6 @@
 
 DatabaseService::DatabaseService() {}
 
-DatabaseService::~DatabaseService()
-{
-    closeDatabase();
-}
-
 void DatabaseService::openDatabase(const std::string &dbName)
 {
     if (sqlite3_open(dbName.c_str(), &db))
@@ -78,20 +73,4 @@ FinanceRecord DatabaseService::getRecordById(int id) const
 
     sqlite3_finalize(stmt);
     return record;
-}
-
-DatabaseService::DatabaseService(DatabaseService &&other) noexcept : db(other.db)
-{
-    other.db = nullptr;
-}
-
-DatabaseService &DatabaseService::operator=(DatabaseService &&other) noexcept
-{
-    if (this != &other)
-    {
-        closeDatabase();
-        db = other.db;
-        other.db = nullptr;
-    }
-    return *this;
 }
