@@ -1,7 +1,7 @@
 #include "headers/DatabaseService.h"
 #include "FinanceRecord.cpp"
 
-DatabaseService::DatabaseService() {}
+DatabaseService::DatabaseService() = default;
 
 void DatabaseService::openDatabase(const std::string &dbName)
 {
