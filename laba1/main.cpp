@@ -72,9 +72,7 @@ int main()
             std::cin >> id2;
 
             FinanceRecord record1 = service.getRecordById(id1);
-            FinanceRecord record2 = service.getRecordById(id2);
-
-            if (record1 == record2)
+            if (FinanceRecord record2 = service.getRecordById(id2); record1 == record2)
             {
                 std::cout << "Records are equal." << std::endl;
             }

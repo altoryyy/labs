@@ -1,6 +1,7 @@
 #include "headers/DatabaseService.h"
 #include "FinanceRecord.cpp"
-DatabaseService::DatabaseService() : db(nullptr) {}
+
+DatabaseService::DatabaseService() {}
 
 DatabaseService::~DatabaseService()
 {
@@ -77,4 +78,20 @@ FinanceRecord DatabaseService::getRecordById(int id) const
 
     sqlite3_finalize(stmt);
     return record;
+}
+
+DatabaseService::DatabaseService(DatabaseService &&other) noexcept : db(other.db)
+{
+    other.db = nullptr;
+}
+
+DatabaseService &DatabaseService::operator=(DatabaseService &&other) noexcept
+{
+    if (this != &other)
+    {
+        closeDatabase();
+        db = other.db;
+        other.db = nullptr;
+    }
+    return *this;
 }
