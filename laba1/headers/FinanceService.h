@@ -2,28 +2,19 @@
 #define FINANCESERVICE_H
 
 #include <string>
-#include <iostream>
-#include <sqlite3.h>
-#include "FinanceRecord.h"
+#include "DatabaseService.h"
 #include <iomanip>
+#include "FinanceRecord.h"
+#include "sqlite3.h"
 
 class FinanceService
 {
 private:
-    sqlite3 *db = nullptr;
+    DatabaseService dbService;
+    void executeSQL(const std::string &sql);
 
 public:
     FinanceService();
-    ~FinanceService();
-
-    FinanceService(const FinanceService &other);
-
-    FinanceService(FinanceService &&other) noexcept;
-
-    FinanceService &operator=(const FinanceService &other);
-
-    FinanceService &operator=(FinanceService &&other) noexcept;
-
     void createRecord(const std::string &description, double amount);
     void readRecords() const;
     void updateRecord(int id, const std::string &description, double amount);
@@ -31,9 +22,6 @@ public:
     double calculateTotalBalance() const;
     void clearRecords();
     FinanceRecord getRecordById(int id) const;
-
-    void openDatabase();
-    void closeDatabase();
 };
 
 #endif

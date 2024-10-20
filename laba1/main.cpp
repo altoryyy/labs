@@ -1,7 +1,9 @@
 #include "headers/FinanceService.h"
 #include "FinanceService.cpp"
+#include <iostream>
+#include <iomanip>
 
-int main() // cd "/Users/artemlopatin/уник/labs/laba1/src/" && g++ -std=c++20 main.cpp -o main -lsqlite3 && "/Users/artemlopatin/уник/lабs/laba1/src/"main
+int main()
 {
     FinanceService service;
     int choice;
@@ -60,7 +62,7 @@ int main() // cd "/Users/artemlopatin/уник/labs/laba1/src/" && g++ -std=c++2
             break;
         case 6:
             service.clearRecords();
-            std::cout << "Все записи были удалены." << std::endl;
+            std::cout << "All records cleared." << std::endl;
             break;
         case 7:
         {
@@ -70,9 +72,9 @@ int main() // cd "/Users/artemlopatin/уник/labs/laba1/src/" && g++ -std=c++2
             std::cin >> id2;
 
             FinanceRecord record1 = service.getRecordById(id1);
+            FinanceRecord record2 = service.getRecordById(id2);
 
-            // Declare record2 within the if statement
-            if (FinanceRecord record2 = service.getRecordById(id2); record1 == record2)
+            if (record1 == record2)
             {
                 std::cout << "Records are equal." << std::endl;
             }
