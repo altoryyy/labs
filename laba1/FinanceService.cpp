@@ -13,8 +13,8 @@ FinanceService::FinanceService(double initialBudget)
     budget.loadBudgetFromDatabase(dbService.getDb());
 }
 
-void FinanceService::setTargetBudget(double targetBudget) {
-    this->targetBudget = targetBudget;
+void FinanceService::setTargetBudget(double newTargetBudget) { // Renamed parameter
+    this->targetBudget = newTargetBudget;
     const DatabaseService &dbService = DatabaseService::getInstance();
     const char *sql = "UPDATE Budget SET TargetAmount = ?;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
@@ -22,7 +22,7 @@ void FinanceService::setTargetBudget(double targetBudget) {
         std::cerr << "Ошибка подготовки SQL-запроса!" << std::endl;
         return;
     }
-    sqlite3_bind_double(stmt, 1, targetBudget);
+    sqlite3_bind_double(stmt, 1, newTargetBudget); // Use new parameter name
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Ошибка обновления бюджета: " << sqlite3_errmsg(dbService.getDb()) << std::endl;
     } else {
