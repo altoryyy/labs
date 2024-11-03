@@ -39,8 +39,6 @@ void FinanceService::createIncome(const std::string &description, double amount)
         saveBudget();
     } catch (const std::system_error &e) {
         std::cerr << "Ошибка при создании дохода: " << e.what() << std::endl;
-    } catch (const std::system_error &e) {
-        std::cerr << "Ошибка: " << e.what() << std::endl;
     }
 }
 
@@ -112,8 +110,6 @@ void FinanceService::createExpense(const std::string &description, double amount
         saveBudget();
     } catch (const std::system_error &e) {
         std::cerr << "Ошибка при создании расхода: " << e.what() << std::endl;
-    } catch (const std::system_error &e) {
-        std::cerr << "Ошибка: " << e.what() << std::endl;
     }
 }
 
