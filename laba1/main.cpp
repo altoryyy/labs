@@ -5,8 +5,7 @@
 
 int main()
 {
-    // Создание сервиса финансов
-    FinanceService service(0.0); // Начальное значение бюджета не важно, оно будет загружено из базы
+    FinanceService service(0.0);
     int choice;
     std::string description;
     double amount;
@@ -34,9 +33,9 @@ int main()
 
         switch (choice)
         {
-        case 1: // Установка целевого бюджета
+        case 1:
             std::cout << "Введите целевой бюджет: ";
-            std::cin >> amount; // Используем amount для целевого бюджета
+            std::cin >> amount;
             service.setTargetBudget(amount);
             break;
 
