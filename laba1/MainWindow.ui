@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>769</width>
+    <height>592</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Финансовый менеджер</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="budgetSummaryLabel">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>10</y>
+      <width>281</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 20px; color: white;</string>
+    </property>
+    <property name="text">
+     <string>СВОДКА БЮДЖЕТА</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignmentFlag::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="addIncomeButton">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>410</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	font-size: 40px;
+    background-color: #007BFF; /* Цвет фона кнопки */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем границу */
+    border-radius: 5px; /* Закругление углов */
+    padding: 10px; /* Отступы внутри кнопки */
+}
+
+QPushButton::hover {
+    background-color: #0056b3; /* Цвет фона при наведении */
+}
+
+QPushButton::pressed {
+    background-color: #004494; /* Цвет фона при нажатии */
+    padding-left: 12px; /* Увеличиваем отступы при нажатии */
+    padding-top: 12px; /* Увеличиваем отступы при нажатии */
+}
+
+/* Эффект тени */
+QPushButton::before {
+    content: '';
+    position: absolute;
+    left: -4px; /* Смещение тени по оси X */
+    top: -4px; /* Смещение тени по оси Y */
+    width: 100%;
+    height: 100%;
+    border-radius: 10px; /* Закругление углов тени */
+    background-color: rgba(0, 0, 0, 0.2); /* Цвет и прозрачность тени */
+    z-index: -1; /* Положение под кнопкой */
+}
+</string>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="addExpenseButton">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>410</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	font-size: 40px;
+    background-color: #007BFF; /* Цвет фона кнопки */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем границу */
+    border-radius: 5px; /* Закругление углов */
+    padding: 10px; /* Отступы внутри кнопки */
+}
+
+QPushButton::hover {
+    background-color: #0056b3; /* Цвет фона при наведении */
+}
+
+QPushButton::pressed {
+    background-color: #004494; /* Цвет фона при нажатии */
+    padding-left: 12px; /* Увеличиваем отступы при нажатии */
+    padding-top: 12px; /* Увеличиваем отступы при нажатии */
+}
+
+/* Эффект тени */
+QPushButton::before {
+    content: '';
+    position: absolute;
+    left: -4px; /* Смещение тени по оси X */
+    top: -4px; /* Смещение тени по оси Y */
+    width: 100%;
+    height: 100%;
+    border-radius: 10px; /* Закругление углов тени */
+    background-color: rgba(0, 0, 0, 0.2); /* Цвет и прозрачность тени */
+    z-index: -1; /* Положение под кнопкой */
+}</string>
+    </property>
+    <property name="text">
+     <string>-</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="expenseLabel">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>60</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 15px; color: white;</string>
+    </property>
+    <property name="text">
+     <string>РАСХОДЫ</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="incomeLabel">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>50</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size: 15px; color: white;</string>
+    </property>
+    <property name="text">
+     <string>ДОХОДЫ</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="incomeListWidget">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>90</y>
+      <width>161</width>
+      <height>291</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListWidget {        /* Светло-серая граница */
+    border-radius: 10px;            /* Закругление углов */
+           /* Белый фон */
+}
+
+QListWidget::item {
+    padding: 10px;                   /* Отступы внутри элементов */
+}
+
+QListWidget::item:selected {
+    background: #007BFF;             /* Цвет фона выбранного элемента */
+    color: white;                    /* Цвет текста выбранного элемента */
+}</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="expenseListWidget">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>100</y>
+      <width>161</width>
+      <height>241</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListWidget {        /* Светло-серая граница */
+    border-radius: 10px;            /* Закругление углов */
+           /* Белый фон */
+}
+
+QListWidget::item {
+    padding: 10px;                   /* Отступы внутри элементов */
+}
+
+QListWidget::item:selected {
+    background: #007BFF;             /* Цвет фона выбранного элемента */
+    color: white;                    /* Цвет текста выбранного элемента */
+}</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="setTargetBudgetButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>400</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: #007BFF; /* Цвет фона кнопки */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем границу */
+    border-radius: 5px; /* Закругление углов */
+    padding: 10px; /* Отступы внутри кнопки */
+}
+
+QPushButton::hover {
+    background-color: #0056b3; /* Цвет фона при наведении */
+}
+
+QPushButton::pressed {
+    background-color: #004494; /* Цвет фона при нажатии */
+    padding-left: 12px; /* Увеличиваем отступы при нажатии */
+    padding-top: 12px; /* Увеличиваем отступы при нажатии */
+}
+
+/* Эффект тени */
+QPushButton::before {
+    content: '';
+    position: absolute;
+    left: -4px; /* Смещение тени по оси X */
+    top: -4px; /* Смещение тени по оси Y */
+    width: 100%;
+    height: 100%;
+    border-radius: 10px; /* Закругление углов тени */
+    background-color: rgba(0, 0, 0, 0.2); /* Цвет и прозрачность тени */
+    z-index: -1; /* Положение под кнопкой */
+}</string>
+    </property>
+    <property name="text">
+     <string>Установить бюджет</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="clearButton">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>360</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: #007BFF; /* Цвет фона кнопки */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем границу */
+    border-radius: 5px; /* Закругление углов */
+    padding: 10px; /* Отступы внутри кнопки */
+}
+
+QPushButton::hover {
+    background-color: #0056b3; /* Цвет фона при наведении */
+}
+
+QPushButton::pressed {
+    background-color: #004494; /* Цвет фона при нажатии */
+    padding-left: 12px; /* Увеличиваем отступы при нажатии */
+    padding-top: 12px; /* Увеличиваем отступы при нажатии */
+}
+
+/* Эффект тени */
+QPushButton::before {
+    content: '';
+    position: absolute;
+    left: -4px; /* Смещение тени по оси X */
+    top: -4px; /* Смещение тени по оси Y */
+    width: 100%;
+    height: 100%;
+    border-radius: 10px; /* Закругление углов тени */
+    background-color: rgba(0, 0, 0, 0.2); /* Цвет и прозрачность тени */
+    z-index: -1; /* Положение под кнопкой */
+}</string>
+    </property>
+    <property name="text">
+     <string>Очистить записи</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="updateRecordButton">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>410</y>
+      <width>161</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: #007BFF; /* Цвет фона кнопки */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем границу */
+    border-radius: 5px; /* Закругление углов */
+    padding: 10px; /* Отступы внутри кнопки */
+}
+
+QPushButton::hover {
+    background-color: #0056b3; /* Цвет фона при наведении */
+}
+
+QPushButton::pressed {
+    background-color: #004494; /* Цвет фона при нажатии */
+    padding-left: 12px; /* Увеличиваем отступы при нажатии */
+    padding-top: 12px; /* Увеличиваем отступы при нажатии */
+}
+
+/* Эффект тени */
+QPushButton::before {
+    content: '';
+    position: absolute;
+    left: -4px; /* Смещение тени по оси X */
+    top: -4px; /* Смещение тени по оси Y */
+    width: 100%;
+    height: 100%;
+    border-radius: 10px; /* Закругление углов тени */
+    background-color: rgba(0, 0, 0, 0.2); /* Цвет и прозрачность тени */
+    z-index: -1; /* Положение под кнопкой */
+}</string>
+    </property>
+    <property name="text">
+     <string>Обновить запись</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>120</y>
+      <width>391</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="chartLayout"/>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>769</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Финансовый менеджер</string>
+    </property>
+   </widget>
+   <addaction name="menu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
