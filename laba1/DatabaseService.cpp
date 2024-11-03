@@ -32,7 +32,7 @@ bool DatabaseService::openDatabase(const std::string &dbName) {
     }
 }
 
-void DatabaseService::closeDatabase()  {
+void DatabaseService::closeDatabase() {
     if (db) {
         sqlite3_close(db);
         db = nullptr;
@@ -65,14 +65,14 @@ void DatabaseService::clearRecords() const {
     std::cout << "Executing SQL: " << deleteSql << std::endl;
 
     char *errMsg = nullptr;
-    if (int result = sqlite3_exec(db, deleteSql, nullptr, nullptr, &errMsg) != SQLITE_OK) {
+    if (sqlite3_exec(db, deleteSql, nullptr, nullptr, &errMsg) != SQLITE_OK) {
         std::cerr << "Error clearing records: " << (errMsg ? errMsg : "Unknown error") << std::endl;
         sqlite3_free(errMsg);
     } else {
         std::cout << "All records cleared successfully." << std::endl;
 
         const char *resetSql = "DELETE FROM sqlite_sequence WHERE name='FinanceRecords';";
-        if (int result = sqlite3_exec(db, resetSql, nullptr, nullptr, &errMsg) != SQLITE_OK) {
+        if (sqlite3_exec(db, resetSql, nullptr, nullptr, &errMsg) != SQLITE_OK) {
             std::cerr << "Error resetting ID: " << (errMsg ? errMsg : "Unknown error") << std::endl;
             sqlite3_free(errMsg);
         } else {
@@ -102,7 +102,7 @@ bool DatabaseService::createRecord(const std::string &description, double amount
     sqlite3_bind_double(stmt, 2, amount);
     sqlite3_bind_text(stmt, 3, type.c_str(), -1, SQLITE_STATIC);
 
-    if (int result = sqlite3_step(stmt) != SQLITE_DONE) {
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Error inserting record: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_finalize(stmt);
         executeSQL("ROLLBACK;");
