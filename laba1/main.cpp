@@ -123,6 +123,6 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Main window shown" << std::endl;
 
-    return app.exec();
+    return QApplication::exec(); // Accessing exec statically
 }
 
