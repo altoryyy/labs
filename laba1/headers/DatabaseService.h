@@ -3,30 +3,41 @@
 
 #include <sqlite3.h>
 #include <string>
-#include <iostream>
-#include "FinanceRecord.h"
-#include <format>
+#include <memory>
+#include "FinanceEntry.h"
+#include "ExpenseRecord.h"
+#include "IncomeRecord.h"
 
-class DatabaseService
-{
+class DatabaseService {
 private:
     sqlite3 *db = nullptr;
+    bool isOpen = false;
+
+    DatabaseService() = default;
 
 public:
-    DatabaseService();
-    ~DatabaseService() = default;
-
     DatabaseService(const DatabaseService &) = delete;
     DatabaseService &operator=(const DatabaseService &) = delete;
+
     DatabaseService(DatabaseService &&other) noexcept = default;
     DatabaseService &operator=(DatabaseService &&other) noexcept = default;
 
-    void openDatabase(const std::string &dbName);
+    static DatabaseService& getInstance() {
+        static DatabaseService instance;
+        return instance;
+    }
+
+    bool openDatabase(const std::string &dbName);
     void closeDatabase();
     void clearRecords();
-    FinanceRecord getRecordById(int id) const;
+    bool createRecord(const std::string &description, double amount, const std::string &type);
+    std::unique_ptr<FinanceEntry> getRecordById(int id) const;
     void executeSQL(const std::string &sql);
     sqlite3_stmt *prepareStatement(const std::string &sql) const;
+
+    sqlite3 *getDb() const { return db; }
+
+    void createBudgetTable();
 };
 
 #endif
