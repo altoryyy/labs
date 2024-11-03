@@ -20,9 +20,8 @@ private:
 public:
     explicit FinanceService(double initialBudget = 0.0);
 
-    void setTargetBudget(double budget);
+    void setTargetBudget(double targetBudget);
     void createRecord(const std::string &description, double amount, const std::string &type);
-
     void readRecords() const;
     void updateRecord(int id, const std::string &description, double amount) const;
     void deleteRecord(int id) const;

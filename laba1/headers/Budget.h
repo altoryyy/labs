@@ -10,8 +10,8 @@ class Budget
 {
 private:
     double targetAmount;
-    double totalIncome;
-    double totalExpenses;
+    double totalIncome {0.0};
+    double totalExpenses {0.0};
     std::vector<IncomeRecord> incomeRecords;
     std::vector<ExpenseRecord> expenseRecords;
 
@@ -23,11 +23,12 @@ public:
     void addExpense(const std::string &description, double amount);
     double getTotalIncome() const;
     double getTotalExpenses() const;
+    double getTargetAmount() const;
     double getRemainingBudget() const;
     void displayBudgetSummary() const;
     void displayIncomeRecords() const;
     void displayExpenseRecords() const;
-    double getTargetAmount() const;
+
 
     void saveBudgetToDatabase(sqlite3 *db) const;
     void loadBudgetFromDatabase(sqlite3 *db);
