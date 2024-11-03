@@ -37,9 +37,9 @@ void FinanceService::createIncome(const std::string &description, double amount)
         budget.addIncome(description, amount);
         dbService.createRecord(description, amount, "Income");
         saveBudget();
-    } catch (const std::runtime_error &e) {
+    } catch (const std::system_error &e) {
         std::cerr << "Ошибка при создании дохода: " << e.what() << std::endl;
-    } catch (const std::exception &e) {
+    } catch (const std::system_error &e) {
         std::cerr << "Ошибка: " << e.what() << std::endl;
     }
 }
@@ -110,9 +110,9 @@ void FinanceService::createExpense(const std::string &description, double amount
         budget.addExpense(description, amount);
         dbService.createRecord(description, amount, "Expense");
         saveBudget();
-    } catch (const std::runtime_error &e) {
+    } catch (const std::system_error &e) {
         std::cerr << "Ошибка при создании расхода: " << e.what() << std::endl;
-    } catch (const std::exception &e) {
+    } catch (const std::system_error &e) {
         std::cerr << "Ошибка: " << e.what() << std::endl;
     }
 }
@@ -161,7 +161,7 @@ void FinanceService::displayExpenseRecords() const {
     sqlite3_finalize(stmt);
 }
 
-void FinanceService::saveBudget() {
+void FinanceService::saveBudget() const {
     const DatabaseService &dbService = DatabaseService::getInstance();
     budget.saveBudgetToDatabase(dbService.getDb());
 }
