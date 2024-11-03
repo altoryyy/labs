@@ -66,7 +66,7 @@ void Budget::displayExpenseRecords() const
     }
 }
 
-void Budget::saveBudgetToDatabase(sqlite3 *db)
+void Budget::saveBudgetToDatabase(sqlite3 *db) const
 {
     std::string sql = "INSERT OR REPLACE INTO Budget (ID, TargetAmount) VALUES (1, " + std::to_string(targetAmount) + ");";
     char *errMsg = nullptr;

@@ -47,7 +47,7 @@ void FinanceService::readRecords() const {
     sqlite3_finalize(stmt);
 }
 
-void FinanceService::updateRecord(int id, const std::string &description, double amount) {
+void FinanceService::updateRecord(int id, const std::string &description, double amount) const {
     const DatabaseService &dbService = DatabaseService::getInstance();
 
     std::string sql = "UPDATE FinanceRecords SET Description = ?, Amount = ? WHERE ID = ?;";
@@ -68,7 +68,7 @@ void FinanceService::updateRecord(int id, const std::string &description, double
     sqlite3_finalize(stmt);
 }
 
-void FinanceService::deleteRecord(int id) {
+void FinanceService::deleteRecord(int id) const {
     const DatabaseService &dbService = DatabaseService::getInstance(); // Используем Singleton
 
     std::string sql = std::format("DELETE FROM FinanceRecords WHERE ID = {}; ", id);
@@ -276,7 +276,7 @@ std::vector<std::unique_ptr<FinanceEntry>> FinanceService::getRecords() const {
     return records;
 }
 
-void FinanceService::clearRecords() {
+void FinanceService::clearRecords() const {
     const DatabaseService &dbService = DatabaseService::getInstance();
     dbService.clearRecords();
 }
