@@ -22,7 +22,7 @@ public:
     DatabaseService(DatabaseService &&other) noexcept = default;
     DatabaseService &operator=(DatabaseService &&other) noexcept = default;
 
-    static DatabaseService& getInstance() {
+    static inline DatabaseService& getInstance() {
         static DatabaseService instance;
         return instance;
     }
@@ -40,4 +40,4 @@ public:
     void createBudgetTable();
 };
 
-#endif
+#endif // DATABASESERVICE_H
