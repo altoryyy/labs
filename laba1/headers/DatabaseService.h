@@ -23,7 +23,6 @@ public:
     DatabaseService &operator=(DatabaseService &&other) noexcept = default;
 
     static inline DatabaseService& getInstance() {
-        static inline DatabaseService instance;
         return instance;
     }
 
