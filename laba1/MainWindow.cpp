@@ -6,8 +6,6 @@
     #include <QtCharts/QPieSeries>
     #include <QtCharts/QChart>
 
-    //using namespace QtCharts;
-
     MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow), financeService(0.0) {
         ui->setupUi(this);
@@ -15,23 +13,21 @@
 
         incomeListWidget = ui->incomeListWidget;
         expenseListWidget = ui->expenseListWidget;
-        budgetSummaryLabel = new QLabel(this); // Initialize the budget summary label
+        budgetSummaryLabel = new QLabel(this);
         budgetSummaryLabel->setGeometry(280, 50, 200, 80);
         budgetSummaryLabel->setAlignment(Qt::AlignCenter);
-        budgetSummaryLabel->setStyleSheet("font-size: 14px; color: gray;"); // Set style for the label
+        budgetSummaryLabel->setStyleSheet("font-size: 14px; color: gray;");
 
         connect(ui->setTargetBudgetButton, &QPushButton::clicked, this, &MainWindow::setTargetBudget);
         connect(ui->addIncomeButton, &QPushButton::clicked, this, &MainWindow::addIncome);
         connect(ui->addExpenseButton, &QPushButton::clicked, this, &MainWindow::addExpense);
         connect(ui->clearButton, &QPushButton::clicked, this, &MainWindow::clearAllRecords);
         connect(ui->updateRecordButton, &QPushButton::clicked, this, &MainWindow::updateRecord);
-
-        // Connect the signal for expenses added
         connect(this, &MainWindow::expensesAdded, this, &MainWindow::createPieChart);
 
         loadRecords();
         createPieChart();
-        updateBudgetSummary(); // Update budget summary when the window is created
+        updateBudgetSummary();
     }
 
     MainWindow::~MainWindow() {
@@ -43,7 +39,7 @@
         try {
             financeService.clearRecords();
             loadRecords();
-            updateBudgetSummary(); // Update budget summary after clearing records
+            updateBudgetSummary();
             QMessageBox::information(this, "Success", "All records have been cleared.");
         } catch (const std::exception &e) {
             QMessageBox::critical(this, "Error", "An error occurred: " + QString::fromStdString(e.what()));
@@ -56,12 +52,11 @@
         inputDialog.setWindowTitle("Set Target Budget");
         inputDialog.setLabelText("Enter target budget:");
         inputDialog.setDoubleRange(0, 1000000);
-        // Указываем количество десятичных знаков непосредственно в getDouble()
         double amount = QInputDialog::getDouble(this, "Set Target Budget", "Enter target budget:", 0, 0, 1000000, 2, &ok);
         if (ok) {
             try {
                 financeService.setTargetBudget(amount);
-                updateBudgetSummary(); // Update budget summary after setting the budget
+                updateBudgetSummary();
                 QMessageBox::information(this, "Success", "Target budget set to " + QString::number(amount, 'f', 2));
             } catch (const std::exception &e) {
                 QMessageBox::critical(this, "Error", "Failed to set target budget: " + QString::fromStdString(e.what()));
@@ -83,7 +78,7 @@
                 try {
                     financeService.createIncome(description.toStdString(), amount);
                     loadRecords();
-                    updateBudgetSummary(); // Update budget summary after adding income
+                    updateBudgetSummary();
                     QMessageBox::information(this, "Success", "Income added: " + description + " - " + QString::number(amount, 'f', 2));
                 } catch (const std::exception &e) {
                     QMessageBox::critical(this, "Error", "Failed to add income: " + QString::fromStdString(e.what()));
@@ -106,8 +101,8 @@
                 try {
                     financeService.createExpense(description.toStdString(), amount);
                     loadRecords();
-                    updateBudgetSummary(); // Update budget summary after adding expense
-                    emit expensesAdded(); // Emit signal to update the pie chart
+                    updateBudgetSummary();
+                    emit expensesAdded();
                     QMessageBox::information(this, "Success", "Expense added: " + description + " - " + QString::number(amount, 'f', 2));
                 } catch (const std::exception &e) {
                     QMessageBox::critical(this, "Error", "Failed to add expense: " + QString::fromStdString(e.what()));
@@ -129,10 +124,9 @@
             if (ok && !newDescription.isEmpty()) {
                 double newAmount = QInputDialog::getDouble(this, "New Amount", "Enter new amount:", 0, 0, 1000000, 2, &ok);
                 if (ok) {
-                    // Здесь вызовите метод вашего сервиса для обновления записи
                     financeService.updateRecord(recordId, newDescription.toStdString(), newAmount);
-                    loadRecords(); // Обновите список после изменения
-                    updateBudgetSummary(); // Обновите сводку бюджета
+                    loadRecords();
+                    updateBudgetSummary();
                     QMessageBox::information(this, "Success", "Record updated.");
                 }
             }
@@ -167,8 +161,8 @@
 
     void MainWindow::updateBudgetSummary() {
         try {
-            QString budgetSummary = financeService.getBudgetSummary(); // Получаем сводку бюджета
-            budgetSummaryLabel->setText(budgetSummary); // Устанавливаем текст в метку
+            QString budgetSummary = financeService.getBudgetSummary();
+            budgetSummaryLabel->setText(budgetSummary);
         } catch (const std::exception &e) {
             QMessageBox::warning(this, "Ошибка", "Не удалось обновить сводку бюджета: " + QString::fromStdString(e.what()));
         }
@@ -176,76 +170,59 @@
 
 
     void MainWindow::createPieChart() {
-        // Удаляем все виджеты из layout
         QLayoutItem *item;
         while ((item = ui->chartLayout->takeAt(0)) != nullptr) {
-            delete item->widget(); // Удаляем виджет
-            delete item; // Удаляем сам элемент layout
+            delete item->widget();
+            delete item;
         }
 
-        // Создание серии для круговой диаграммы
         QPieSeries *series = new QPieSeries();
 
-        // Получаем записи расходов из базы данных
         auto records = financeService.getRecords();
 
-        // Перебираем записи и добавляем их в диаграмму
         QStringList colors = {
-            "#007BFF", // Основной цвет (синий)
-            "#339FFF", // Светлый оттенок 1
-            "#66B3FF", // Светлый оттенок 2
-            "#99D6FF", // Светлый оттенок 3
-            "#0066CC", // Темный оттенок 1
-            "#005BB5", // Темный оттенок 2
-            "#004999"  // Темный оттенок 3
+            "#007BFF",
+            "#339FFF",
+            "#66B3FF",
+            "#99D6FF",
+            "#0066CC",
+            "#005BB5",
+            "#004999"
         };
 
         for (const auto &record : records) {
             if (record->getType() == "Expense") {
-                // Добавляем запись в серию и устанавливаем цвет
                 auto slice = series->append(QString::fromStdString(record->getDescription()), record->getAmount());
-                // Установка цвета для каждого сектора
                 slice->setBrush(QBrush(QColor(colors[series->count() % colors.size()])));
-                // Установка метки с названием и процентом
                 slice->setLabel(QString("%1\n%2%").arg(QString::fromStdString(record->getDescription())).arg(QString::number(slice->percentage() * 100, 'f', 1)));
-                slice->setLabelBrush(QBrush(Qt::white)); // Установка цвета меток на белый
+                slice->setLabelBrush(QBrush(Qt::white));
             }
         }
 
-        // Проверка, есть ли данные для отображения
         if (series->count() == 0) {
             QMessageBox::information(this, "Нет данных", "Нет доступных записей расходов для отображения.");
-            return; // Выходим из функции
+            return;
         }
 
-        // Включаем отображение меток на секторах
-        series->setLabelsVisible(true); // Показываем метки для секторов
+        series->setLabelsVisible(true);
 
-
-        // Создание диаграммы
         QChart *chart = new QChart();
         chart->addSeries(series);
 
-        // Убираем заголовок диаграммы
-        chart->setTitle(""); // Убираем заголовок
+        chart->setTitle("");
 
-        // Убираем легенду
-        chart->legend()->setVisible(false); // Убираем легенду
+        chart->legend()->setVisible(false);
 
-        // Установка прозрачного фона для диаграммы
-        chart->setBackgroundBrush(Qt::transparent); // Прозрачный фон для диаграммы
-        chart->setPlotAreaBackgroundBrush(Qt::transparent); // Прозрачный фон для области диаграммы
-        chart->setPlotAreaBackgroundPen(QPen(Qt::transparent)); // Убираем границу области диаграммы
+        chart->setBackgroundBrush(Qt::transparent);
+        chart->setPlotAreaBackgroundBrush(Qt::transparent);
+        chart->setPlotAreaBackgroundPen(QPen(Qt::transparent));
 
-        // Создание виджета для отображения диаграммы
         QChartView *chartView = new QChartView(chart);
         chartView->setRenderHint(QPainter::Antialiasing);
-        chartView->setBackgroundBrush(Qt::transparent); // Прозрачный фон для виджета
+        chartView->setBackgroundBrush(Qt::transparent);
 
-        // Установка диаграммы в нужный контейнер в вашем интерфейсе
         ui->chartLayout->addWidget(chartView);
 
-        // Установка прозрачного фона для родительского виджета
         QWidget *parentWidget = ui->chartLayout->parentWidget();
         if (parentWidget) {
             parentWidget->setStyleSheet("background: transparent;");

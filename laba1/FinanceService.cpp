@@ -2,6 +2,7 @@
 #include "DatabaseService.h"
 #include "Budget.h"
 #include <format>
+#include <stdexcept>
 
 FinanceService::FinanceService(double target)
     : budget(target)
@@ -14,7 +15,7 @@ FinanceService::FinanceService(double target)
 }
 
 void FinanceService::readRecords() const {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     const char *sql = "SELECT ID, Description, Amount, Type FROM FinanceRecords;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
@@ -47,7 +48,7 @@ void FinanceService::readRecords() const {
 }
 
 void FinanceService::updateRecord(int id, const std::string &description, double amount) {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     std::string sql = "UPDATE FinanceRecords SET Description = ?, Amount = ? WHERE ID = ?;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
@@ -68,14 +69,14 @@ void FinanceService::updateRecord(int id, const std::string &description, double
 }
 
 void FinanceService::deleteRecord(int id) {
-    DatabaseService &dbService = DatabaseService::getInstance(); // Используем Singleton
+    const DatabaseService &dbService = DatabaseService::getInstance(); // Используем Singleton
 
     std::string sql = std::format("DELETE FROM FinanceRecords WHERE ID = {}; ", id);
     dbService.executeSQL(sql);
 }
 
 std::unique_ptr<FinanceEntry> FinanceService::getRecordById(int id) const {
-    DatabaseService &dbService = DatabaseService::getInstance(); // Используем Singleton
+    const DatabaseService &dbService = DatabaseService::getInstance(); // Используем Singleton
     auto record = dbService.getRecordById(id);
 
     if (!record) {
@@ -87,19 +88,19 @@ std::unique_ptr<FinanceEntry> FinanceService::getRecordById(int id) const {
 }
 
 void FinanceService::createIncome(const std::string &description, double amount) {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     try {
         budget.addIncome(description, amount);
         dbService.createRecord(description, amount, "Income");
         saveBudget();
-    } catch (const std::exception &e) {
-        std::cerr << "Error creating income: " << e.what() << std::endl;
+    } catch (const std::runtime_error &e) {
+        std::cerr << "Ошибка при создании дохода: " << e.what() << std::endl;
     }
 }
 
 void FinanceService::createExpense(const std::string &description, double amount) {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     budget.addExpense(description, amount);
     dbService.createRecord(description, amount, "Expense");
@@ -107,7 +108,7 @@ void FinanceService::createExpense(const std::string &description, double amount
 }
 
 void FinanceService::displayIncomeRecords() const {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     const char *sql = "SELECT * FROM FinanceRecords WHERE Type = 'Income' ORDER BY Description;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
@@ -135,7 +136,7 @@ void FinanceService::displayIncomeRecords() const {
 }
 
 void FinanceService::displayExpenseRecords() const {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     const char *sql = "SELECT * FROM FinanceRecords WHERE Type = 'Expense' ORDER BY Description;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
@@ -163,14 +164,14 @@ void FinanceService::displayExpenseRecords() const {
 }
 
 void FinanceService::saveBudget() {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
     budget.saveBudgetToDatabase(dbService.getDb());
 }
 
 void FinanceService::setTargetBudget(double budget) {
     targetBudget = budget;
 
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
     const char *sql = "UPDATE Budget SET TargetAmount = ?;";
 
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
@@ -191,7 +192,7 @@ void FinanceService::setTargetBudget(double budget) {
 }
 
 double FinanceService::calculateTotalIncome() const {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     double totalIncome = 0.0;
     const char *sql = "SELECT SUM(Amount) FROM FinanceRecords WHERE Type = 'Income';";
@@ -211,7 +212,7 @@ double FinanceService::calculateTotalIncome() const {
 }
 
 double FinanceService::calculateTotalExpenses() const {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     double totalExpenses = 0.0;
     const char *sql = "SELECT SUM(Amount) FROM FinanceRecords WHERE Type = 'Expense';";
@@ -245,7 +246,7 @@ QString FinanceService::getBudgetSummary() const {
 
 std::vector<std::unique_ptr<FinanceEntry>> FinanceService::getRecords() const {
     std::vector<std::unique_ptr<FinanceEntry>> records;
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
 
     const char *sql = "SELECT ID, Description, Amount, Type FROM FinanceRecords;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
@@ -276,6 +277,6 @@ std::vector<std::unique_ptr<FinanceEntry>> FinanceService::getRecords() const {
 }
 
 void FinanceService::clearRecords() {
-    DatabaseService &dbService = DatabaseService::getInstance();
+    const DatabaseService &dbService = DatabaseService::getInstance();
     dbService.clearRecords();
 }

@@ -32,7 +32,7 @@ bool DatabaseService::openDatabase(const std::string &dbName) {
     }
 }
 
-void DatabaseService::closeDatabase() {
+void DatabaseService::closeDatabase()  {
     if (db) {
         sqlite3_close(db);
         db = nullptr;
@@ -41,7 +41,7 @@ void DatabaseService::closeDatabase() {
     }
 }
 
-void DatabaseService::executeSQL(const std::string &sql) {
+void DatabaseService::executeSQL(const std::string &sql) const {
     char *errMsg = nullptr;
     if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK) {
         std::cerr << "SQL error: " << (errMsg ? errMsg : "Unknown error") << std::endl;
@@ -60,23 +60,19 @@ sqlite3_stmt *DatabaseService::prepareStatement(const std::string &sql) const {
     return stmt;
 }
 
-void DatabaseService::clearRecords() {
+void DatabaseService::clearRecords() const {
     const char *deleteSql = "DELETE FROM FinanceRecords;";
     std::cout << "Executing SQL: " << deleteSql << std::endl;
 
     char *errMsg = nullptr;
-    int result = sqlite3_exec(db, deleteSql, nullptr, nullptr, &errMsg);
-
-    if (result != SQLITE_OK) {
+    if (int result = sqlite3_exec(db, deleteSql, nullptr, nullptr, &errMsg) != SQLITE_OK) {
         std::cerr << "Error clearing records: " << (errMsg ? errMsg : "Unknown error") << std::endl;
         sqlite3_free(errMsg);
     } else {
         std::cout << "All records cleared successfully." << std::endl;
 
         const char *resetSql = "DELETE FROM sqlite_sequence WHERE name='FinanceRecords';";
-        result = sqlite3_exec(db, resetSql, nullptr, nullptr, &errMsg);
-
-        if (result != SQLITE_OK) {
+        if (int result = sqlite3_exec(db, resetSql, nullptr, nullptr, &errMsg) != SQLITE_OK) {
             std::cerr << "Error resetting ID: " << (errMsg ? errMsg : "Unknown error") << std::endl;
             sqlite3_free(errMsg);
         } else {
@@ -85,7 +81,7 @@ void DatabaseService::clearRecords() {
     }
 }
 
-bool DatabaseService::createRecord(const std::string &description, double amount, const std::string &type) {
+bool DatabaseService::createRecord(const std::string &description, double amount, const std::string &type) const {
     if (!isOpen) {
         std::cerr << "Database is not open. Cannot create record." << std::endl;
         return false;
@@ -106,8 +102,7 @@ bool DatabaseService::createRecord(const std::string &description, double amount
     sqlite3_bind_double(stmt, 2, amount);
     sqlite3_bind_text(stmt, 3, type.c_str(), -1, SQLITE_STATIC);
 
-    int result = sqlite3_step(stmt);
-    if (result != SQLITE_DONE) {
+    if (int result = sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Error inserting record: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_finalize(stmt);
         executeSQL("ROLLBACK;");

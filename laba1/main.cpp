@@ -1,122 +1,129 @@
-#include "headers/FinanceService.h"
-#include "FinanceService.cpp"
+/*#include "FinanceService.h"
 #include <iostream>
 #include <iomanip>
+#include "ActionHandler.h"
 
 int main()
 {
-    FinanceService service;
+    // Создание сервиса финансов
+    FinanceService service(0.0); // Начальное значение бюджета не важно, оно будет загружено из базы
     int choice;
     std::string description;
     double amount;
-    int id1;
-    int id2;
+    int id;
 
     std::cout << std::fixed << std::setprecision(2);
 
     do
     {
-        std::cout << "1. Create Record\n"
-                  << "2. Read Records\n"
-                  << "3. Update Record\n"
-                  << "4. Delete Record\n"
-                  << "5. Calculate Total Balance\n"
-                  << "6. Clear Records\n"
-                  << "7. Compare Records\n"
-                  << "8. Add Records\n"
-                  << "9. Subtract Records\n"
-                  << "0. Exit\n";
-        std::cout << "Enter your choice: ";
+        std::cout << "\n1. Установить целевой бюджет\n"
+                  << "2. Создать запись дохода\n"
+                  << "3. Создать запись расхода\n"
+                  << "4. Прочитать записи\n"
+                  << "5. Обновить запись\n"
+                  << "6. Удалить запись\n"
+                  << "7. Показать сводку бюджета\n"
+                  << "8. Показать записи доходов\n"
+                  << "9. Показать записи расходов\n"
+                  << "10. Очистить записи\n"
+                  << "0. Выход\n";
+        std::cout << "Введите ваш выбор: ";
         std::cin >> choice;
+
+        ActionHandler<FinanceService> handler;
 
         switch (choice)
         {
-        case 1:
-            std::cout << "Enter description: ";
+        case 1: // Установка целевого бюджета
+            std::cout << "Введите целевой бюджет: ";
+            std::cin >> amount; // Используем amount для целевого бюджета
+            service.setTargetBudget(amount);
+            break;
+
+        case 2:
+            std::cout << "Введите описание дохода: ";
             std::cin.ignore();
             std::getline(std::cin, description);
-            std::cout << "Enter amount: ";
+            std::cout << "Введите сумму дохода: ";
             std::cin >> amount;
-            service.createRecord(description, amount);
+            handler.execute(description, amount, [&](const std::string &desc, double amt)
+                            { service.createIncome(desc, amt); });
             break;
-        case 2:
+
+        case 3:
+            std::cout << "Введите описание расхода: ";
+            std::cin.ignore();
+            std::getline(std::cin, description);
+            std::cout << "Введите сумму расхода: ";
+            std::cin >> amount;
+            handler.execute(description, amount, [&](const std::string &desc, double amt)
+                            { service.createExpense(desc, amt); });
+            break;
+
+        case 4:
             service.readRecords();
             break;
-        case 3:
-            std::cout << "Enter ID of the record to update: ";
-            std::cin >> id1;
-            std::cout << "Enter new description: ";
+
+        case 5:
+            std::cout << "Введите ID записи для обновления: ";
+            std::cin >> id;
+            std::cout << "Введите новое описание: ";
             std::cin.ignore();
             std::getline(std::cin, description);
-            std::cout << "Enter new amount: ";
+            std::cout << "Введите новую сумму: ";
             std::cin >> amount;
-            service.updateRecord(id1, description, amount);
+            service.updateRecord(id, description, amount);
             break;
-        case 4:
-            std::cout << "Enter ID of the record to delete: ";
-            std::cin >> id1;
-            service.deleteRecord(id1);
-            break;
-        case 5:
-            std::cout << "Total Balance: " << service.calculateTotalBalance() << std::endl;
-            break;
+
         case 6:
-            service.clearRecords();
-            std::cout << "All records cleared." << std::endl;
+            std::cout << "Введите ID записи для удаления: ";
+            std::cin >> id;
+            service.deleteRecord(id);
             break;
+
         case 7:
-        {
-            std::cout << "Enter ID of the first record to compare: ";
-            std::cin >> id1;
-            std::cout << "Enter ID of the second record to compare: ";
-            std::cin >> id2;
-
-            FinanceRecord record1 = service.getRecordById(id1);
-            if (FinanceRecord record2 = service.getRecordById(id2); record1 == record2)
-            {
-                std::cout << "Records are equal." << std::endl;
-            }
-            else
-            {
-                std::cout << "Records are not equal." << std::endl;
-            }
+            service.displayBudgetSummary();
             break;
-        }
+
         case 8:
-        {
-            std::cout << "Enter ID of the first record to add: ";
-            std::cin >> id1;
-            std::cout << "Enter ID of the second record to add: ";
-            std::cin >> id2;
-
-            FinanceRecord record1 = service.getRecordById(id1);
-            FinanceRecord record2 = service.getRecordById(id2);
-            FinanceRecord combinedRecord = record1 + record2;
-
-            std::cout << "Combined Record: " << combinedRecord << std::endl;
+            service.displayIncomeRecords();
             break;
-        }
+
         case 9:
-        {
-            std::cout << "Enter ID of the first record to subtract: ";
-            std::cin >> id1;
-            std::cout << "Enter ID of the second record to subtract: ";
-            std::cin >> id2;
-
-            FinanceRecord record1 = service.getRecordById(id1);
-            FinanceRecord record2 = service.getRecordById(id2);
-            FinanceRecord subtractedRecord = record1 - record2;
-
-            std::cout << "Subtracted Record: " << subtractedRecord << std::endl;
+            service.displayExpenseRecords();
             break;
-        }
+
+        case 11:
+            service.clearRecords();
+            std::cout << "Все записи очищены." << std::endl;
+            break;
+
         case 0:
-            std::cout << "Exiting..." << std::endl;
+            std::cout << "Выход..." << std::endl;
             break;
+
         default:
-            std::cerr << "Invalid choice!" << std::endl;
+            std::cerr << "Неверный выбор!" << std::endl;
         }
     } while (choice != 0);
 
     return 0;
+}*/
+
+#include <QApplication>
+#include "MainWindow.h"
+#include <iostream>
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    std::cout << "Application started" << std::endl;
+
+    MainWindow window;
+    window.show();
+
+    std::cout << "Main window shown" << std::endl;
+
+    return app.exec();
 }
+
