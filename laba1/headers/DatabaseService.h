@@ -29,10 +29,10 @@ public:
 
     bool openDatabase(const std::string &dbName);
     void closeDatabase();
-    void clearRecords();
-    bool createRecord(const std::string &description, double amount, const std::string &type);
+    void clearRecords() const;
+    bool createRecord(const std::string &description, double amount, const std::string &type) const;
     std::unique_ptr<FinanceEntry> getRecordById(int id) const;
-    void executeSQL(const std::string &sql);
+    void executeSQL(const std::string &sql) const;
     sqlite3_stmt *prepareStatement(const std::string &sql) const;
 
     sqlite3 *getDb() const { return db; }

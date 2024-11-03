@@ -3,12 +3,14 @@
 
 #include <string>
 #include <iostream>
+#include <memory>
+#include <vector>
+#include <format>
 #include "DatabaseService.h"
 #include "Budget.h"
 #include "sqlite3.h"
 #include "FinanceEntry.h"
 #include <QString>
-#include <format>
 
 class FinanceService {
 private:
@@ -17,11 +19,14 @@ private:
 
 public:
     explicit FinanceService(double initialBudget = 0.0);
+
     void setTargetBudget(double budget);
     void createRecord(const std::string &description, double amount, const std::string &type);
+
     void readRecords() const;
     void updateRecord(int id, const std::string &description, double amount);
     void deleteRecord(int id);
+
     double calculateTotalBalance() const;
     void clearRecords();
     std::unique_ptr<FinanceEntry> getRecordById(int id) const;
