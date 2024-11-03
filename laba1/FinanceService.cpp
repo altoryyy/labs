@@ -3,6 +3,7 @@
 #include "Budget.h"
 #include <format>
 #include <stdexcept>
+#include <functional>
 
 FinanceService::FinanceService(double initialBudget)
     : budget(initialBudget), targetBudget(initialBudget) {
@@ -38,17 +39,22 @@ void FinanceService::executeUpdate(const std::string &sql, double value) const {
 }
 
 void FinanceService::createIncome(const std::string &description, double amount) {
-    processTransaction(description, amount, "Income", &Budget::addIncome);
+    processTransaction(description, amount, "Income", [this](const std::string &desc, double amt) {
+        budget.addIncome(desc, amt);
+    });
 }
 
 void FinanceService::createExpense(const std::string &description, double amount) {
-    processTransaction(description, amount, "Expense", &Budget::addExpense);
+    processTransaction(description, amount, "Expense", [this](const std::string &desc, double amt) {
+        budget.addExpense(desc, amt);
+    });
 }
 
-void FinanceService::processTransaction(const std::string &description, double amount, const std::string &type, void (Budget::*method)(const std::string&, double)) {
+void FinanceService::processTransaction(const std::string &description, double amount, const std::string &type, 
+    const std::function<void(const std::string&, double)>& method) {
     const DatabaseService &dbService = DatabaseService::getInstance();
     try {
-        (budget.*method)(description, amount);
+        method(description, amount);
         dbService.createRecord(description, amount, type);
         saveBudget();
     } catch (const std::system_error &e) {
