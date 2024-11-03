@@ -16,29 +16,15 @@ public:
         }
     }
 
-    IncomeRecord(const IncomeRecord& other)
-        : FinanceEntry(other) {}
+    IncomeRecord(const IncomeRecord& other) = default;
+    IncomeRecord(IncomeRecord&& other) noexcept = default;
 
-    IncomeRecord(IncomeRecord&& other) noexcept
-        : FinanceEntry(std::move(other)) {}
-
-    IncomeRecord& operator=(const IncomeRecord& other) {
-        if (this != &other) {
-            FinanceEntry::operator=(other);
-        }
-        return *this;
-    }
-
-    IncomeRecord& operator=(IncomeRecord&& other) noexcept {
-        if (this != &other) {
-            FinanceEntry::operator=(std::move(other));
-        }
-        return *this;
-    }
+    IncomeRecord& operator=(const IncomeRecord& other) = default;
+    IncomeRecord& operator=(IncomeRecord&& other) noexcept = default;
 
     std::string getType() const override {
         return "Income";
     }
 };
 
-#endif // INCOMERECORD_H
+#endif

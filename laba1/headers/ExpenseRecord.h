@@ -16,25 +16,11 @@ public:
         }
     }
 
-    ExpenseRecord(const ExpenseRecord& other)
-        : FinanceEntry(other) {}
+    ExpenseRecord(const ExpenseRecord& other) = default;
+    ExpenseRecord(ExpenseRecord&& other) noexcept = default;
 
-    ExpenseRecord(ExpenseRecord&& other) noexcept
-        : FinanceEntry(std::move(other)) {}
-
-    ExpenseRecord& operator=(const ExpenseRecord& other) {
-        if (this != &other) {
-            FinanceEntry::operator=(other);
-        }
-        return *this;
-    }
-
-    ExpenseRecord& operator=(ExpenseRecord&& other) noexcept {
-        if (this != &other) {
-            FinanceEntry::operator=(std::move(other));
-        }
-        return *this;
-    }
+    ExpenseRecord& operator=(const ExpenseRecord& other) = default;
+    ExpenseRecord& operator=(ExpenseRecord&& other) noexcept = default;
 
     std::string getType() const override {
         return "Expense";

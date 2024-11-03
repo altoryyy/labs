@@ -14,30 +14,11 @@ public:
     FinanceEntry(const std::string &description, double amount, int id)
         : description(description), amount(amount), id(id) {}
 
-    FinanceEntry(const FinanceEntry& other)
-        : description(other.description), amount(other.amount), id(other.id) {}
+    FinanceEntry(const FinanceEntry& other) = default;
+    FinanceEntry(FinanceEntry&& other) noexcept = default;
 
-    FinanceEntry(FinanceEntry&& other) noexcept
-        : description(std::move(other.description)),
-        amount(other.amount), id(other.id) {}
-
-    FinanceEntry& operator=(const FinanceEntry& other) {
-        if (this != &other) {
-            description = other.description;
-            amount = other.amount;
-            id = other.id;
-        }
-        return *this;
-    }
-
-    FinanceEntry& operator=(FinanceEntry&& other) noexcept {
-        if (this != &other) {
-            description = std::move(other.description);
-            amount = other.amount;
-            id = other.id;
-        }
-        return *this;
-    }
+    FinanceEntry& operator=(const FinanceEntry& other) = default;
+    FinanceEntry& operator=(FinanceEntry&& other) noexcept = default;
 
     virtual ~FinanceEntry() = default;
 

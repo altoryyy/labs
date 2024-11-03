@@ -43,7 +43,7 @@ public:
     double calculateTotalExpenses() const;
 
     void loadBudget();
-    void saveBudget();
+    void saveBudget() const;
 };
 
 #endif
