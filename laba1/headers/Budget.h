@@ -17,7 +17,7 @@ private:
 
 public:
     Budget();
-    Budget(double target);
+    explicit Budget(double target);
 
     void addIncome(const std::string &description, double amount);
     void addExpense(const std::string &description, double amount);
@@ -29,7 +29,7 @@ public:
     void displayExpenseRecords() const;
     double getTargetAmount() const;
 
-    void saveBudgetToDatabase(sqlite3 *db);
+    void saveBudgetToDatabase(sqlite3 *db) const;
     void loadBudgetFromDatabase(sqlite3 *db);
 
     ~Budget() = default;

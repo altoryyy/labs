@@ -24,11 +24,11 @@ public:
     void createRecord(const std::string &description, double amount, const std::string &type);
 
     void readRecords() const;
-    void updateRecord(int id, const std::string &description, double amount);
-    void deleteRecord(int id);
+    void updateRecord(int id, const std::string &description, double amount) const;
+    void deleteRecord(int id) const;
 
     double calculateTotalBalance() const;
-    void clearRecords();
+    void clearRecords() const;
     std::unique_ptr<FinanceEntry> getRecordById(int id) const;
 
     void createIncome(const std::string &description, double amount);
