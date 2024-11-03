@@ -6,45 +6,62 @@
 
 FinanceService::FinanceService(double initialBudget)
     : budget(initialBudget), targetBudget(initialBudget) {
-    DatabaseService &dbService = DatabaseService::getInstance();
-    if (!dbService.openDatabase("Records.db")) {
+    if (!initializeDatabase()) {
         std::cerr << "Не удалось открыть базу данных!" << std::endl;
     }
-    budget.loadBudgetFromDatabase(dbService.getDb());
+    budget.loadBudgetFromDatabase(DatabaseService::getInstance().getDb());
 }
 
-void FinanceService::setTargetBudget(double newTargetBudget) { // Renamed parameter
+bool FinanceService::initializeDatabase() {
+    DatabaseService &dbService = DatabaseService::getInstance();
+    return dbService.openDatabase("Records.db");
+}
+
+void FinanceService::setTargetBudget(double newTargetBudget) {
     this->targetBudget = newTargetBudget;
+    executeUpdate("UPDATE Budget SET TargetAmount = ?", newTargetBudget);
+    std::cout << "Целевой бюджет установлен: " << this->targetBudget << std::endl;
+}
+
+void FinanceService::executeUpdate(const std::string &sql, double value) const {
     const DatabaseService &dbService = DatabaseService::getInstance();
-    const char *sql = "UPDATE Budget SET TargetAmount = ?;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
     if (!stmt) {
         std::cerr << "Ошибка подготовки SQL-запроса!" << std::endl;
         return;
     }
-    sqlite3_bind_double(stmt, 1, newTargetBudget); // Use new parameter name
+    sqlite3_bind_double(stmt, 1, value);
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        std::cerr << "Ошибка обновления бюджета: " << sqlite3_errmsg(dbService.getDb()) << std::endl;
-    } else {
-        std::cout << "Целевой бюджет установлен: " << this->targetBudget << std::endl;
+        std::cerr << "Ошибка обновления: " << sqlite3_errmsg(dbService.getDb()) << std::endl;
     }
     sqlite3_finalize(stmt);
 }
 
 void FinanceService::createIncome(const std::string &description, double amount) {
+    processTransaction(description, amount, "Income", &Budget::addIncome);
+}
+
+void FinanceService::createExpense(const std::string &description, double amount) {
+    processTransaction(description, amount, "Expense", &Budget::addExpense);
+}
+
+void FinanceService::processTransaction(const std::string &description, double amount, const std::string &type, void (Budget::*method)(const std::string&, double)) {
     const DatabaseService &dbService = DatabaseService::getInstance();
     try {
-        budget.addIncome(description, amount);
-        dbService.createRecord(description, amount, "Income");
+        (budget.*method)(description, amount);
+        dbService.createRecord(description, amount, type);
         saveBudget();
     } catch (const std::system_error &e) {
-        std::cerr << "Ошибка при создании дохода: " << e.what() << std::endl;
+        std::cerr << "Ошибка при создании " << type << ": " << e.what() << std::endl;
     }
 }
 
 void FinanceService::readRecords() const {
+    executeReadQuery("SELECT ID, Description, Amount, Type FROM FinanceRecords;");
+}
+
+void FinanceService::executeReadQuery(const std::string &sql) const {
     const DatabaseService &dbService = DatabaseService::getInstance();
-    const char *sql = "SELECT ID, Description, Amount, Type FROM FinanceRecords;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
     if (!stmt) {
         std::cerr << "Ошибка подготовки SQL-запроса!" << std::endl;
@@ -55,15 +72,9 @@ void FinanceService::readRecords() const {
         std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         double amount = sqlite3_column_double(stmt, 2);
         std::string type = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        std::unique_ptr<FinanceEntry> record;
-        if (type == "Income") {
-            record = std::make_unique<IncomeRecord>(description, amount, id);
-        } else if (type == "Expense") {
-            record = std::make_unique<ExpenseRecord>(description, amount, id);
-        } else {
-            std::cerr << "Неизвестный тип записи: " << type << std::endl;
-            continue;
-        }
+        auto record = (type == "Income")
+            ? std::make_unique<IncomeRecord>(description, amount, id)
+            : std::make_unique<ExpenseRecord>(description, amount, id);
         record->display();
     }
     sqlite3_finalize(stmt);
@@ -94,67 +105,15 @@ void FinanceService::deleteRecord(int id) const {
 
 std::unique_ptr<FinanceEntry> FinanceService::getRecordById(int id) const {
     const DatabaseService &dbService = DatabaseService::getInstance();
-    auto record = dbService.getRecordById(id);
-    if (!record) {
-        std::cerr << "Запись с ID " << id << " не найдена!" << std::endl;
-        return nullptr;
-    }
-    return record;
-}
-
-void FinanceService::createExpense(const std::string &description, double amount) {
-    const DatabaseService &dbService = DatabaseService::getInstance();
-    try {
-        budget.addExpense(description, amount);
-        dbService.createRecord(description, amount, "Expense");
-        saveBudget();
-    } catch (const std::system_error &e) {
-        std::cerr << "Ошибка при создании расхода: " << e.what() << std::endl;
-    }
+    return dbService.getRecordById(id);
 }
 
 void FinanceService::displayIncomeRecords() const {
-    const DatabaseService &dbService = DatabaseService::getInstance();
-    const char *sql = "SELECT * FROM FinanceRecords WHERE Type = 'Income' ORDER BY Description;";
-    sqlite3_stmt *stmt = dbService.prepareStatement(sql);
-    if (!stmt) {
-        std::cerr << "Ошибка подготовки SQL-запроса!" << std::endl;
-        return;
-    }
-    std::cout << "Записи доходов (отсортированные по описанию):" << std::endl;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int id = sqlite3_column_int(stmt, 0);
-        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        double amount = sqlite3_column_double(stmt, 2);
-        std::string type = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        std::cout << "ID: " << id
-                  << ", Описание: " << description
-                  << ", Сумма: " << amount
-                  << ", Тип: " << type << std::endl;
-    }
-    sqlite3_finalize(stmt);
+    executeReadQuery("SELECT * FROM FinanceRecords WHERE Type = 'Income' ORDER BY Description;");
 }
 
 void FinanceService::displayExpenseRecords() const {
-    const DatabaseService &dbService = DatabaseService::getInstance();
-    const char *sql = "SELECT * FROM FinanceRecords WHERE Type = 'Expense' ORDER BY Description;";
-    sqlite3_stmt *stmt = dbService.prepareStatement(sql);
-    if (!stmt) {
-        std::cerr << "Ошибка подготовки SQL-запроса!" << std::endl;
-        return;
-    }
-    std::cout << "Записи расходов (отсортированные по описанию):" << std::endl;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int id = sqlite3_column_int(stmt, 0);
-        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        double amount = sqlite3_column_double(stmt, 2);
-        std::string type = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        std::cout << "ID: " << id
-                  << ", Описание: " << description
-                  << ", Сумма: " << amount
-                  << ", Тип: " << type << std::endl;
-    }
-    sqlite3_finalize(stmt);
+    executeReadQuery("SELECT * FROM FinanceRecords WHERE Type = 'Expense' ORDER BY Description;");
 }
 
 void FinanceService::saveBudget() const {
@@ -163,35 +122,28 @@ void FinanceService::saveBudget() const {
 }
 
 double FinanceService::calculateTotalIncome() const {
-    const DatabaseService &dbService = DatabaseService::getInstance();
-    double totalIncome = 0.0;
-    const char *sql = "SELECT SUM(Amount) FROM FinanceRecords WHERE Type = 'Income';";
-    sqlite3_stmt *stmt = dbService.prepareStatement(sql);
-    if (!stmt) {
-        std::cerr << "Ошибка подготовки SQL-запроса!" << std::endl;
-        return totalIncome;
-    }
-    if (sqlite3_step(stmt) == SQLITE_ROW) {
-        totalIncome = sqlite3_column_double(stmt, 0);
-    }
-    sqlite3_finalize(stmt);
-    return totalIncome;
+    return calculateTotal("Income");
 }
 
 double FinanceService::calculateTotalExpenses() const {
+    return calculateTotal("Expense");
+}
+
+double FinanceService::calculateTotal(const std::string &type) const {
     const DatabaseService &dbService = DatabaseService::getInstance();
-    double totalExpenses = 0.0;
-    const char *sql = "SELECT SUM(Amount) FROM FinanceRecords WHERE Type = 'Expense';";
+    double total = 0.0;
+    std::string sql = "SELECT SUM(Amount) FROM FinanceRecords WHERE Type = ?;";
     sqlite3_stmt *stmt = dbService.prepareStatement(sql);
     if (!stmt) {
         std::cerr << "Ошибка подготовки SQL-запроса!" << std::endl;
-        return totalExpenses;
+        return total;
     }
+    sqlite3_bind_text(stmt, 1, type.c_str(), -1, SQLITE_STATIC);
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        totalExpenses = sqlite3_column_double(stmt, 0);
+        total = sqlite3_column_double(stmt, 0);
     }
     sqlite3_finalize(stmt);
-    return totalExpenses;
+    return total;
 }
 
 QString FinanceService::getBudgetSummary() const {
@@ -220,12 +172,9 @@ std::vector<std::unique_ptr<FinanceEntry>> FinanceService::getRecords() const {
         std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         double amount = sqlite3_column_double(stmt, 2);
         std::string type = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        std::unique_ptr<FinanceEntry> record;
-        if (type == "Income") {
-            record = std::make_unique<IncomeRecord>(description, amount, id);
-        } else {
-            record = std::make_unique<ExpenseRecord>(description, amount, id);
-        }
+        auto record = (type == "Income")
+            ? std::make_unique<IncomeRecord>(description, amount, id)
+            : std::make_unique<ExpenseRecord>(description, amount, id);
         records.push_back(std::move(record));
     }
     sqlite3_finalize(stmt);
