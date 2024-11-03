@@ -23,16 +23,16 @@ class MainWindow : public QMainWindow {
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    virtual ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
     QListWidget *incomeListWidget;
     QListWidget *expenseListWidget;
     FinanceService financeService;
-    QLabel *budgetSummaryLabel; // New label for budget summary
+    QLabel *budgetSummaryLabel;
     void loadRecords();
-    void updateBudgetSummary(); // New method to update the budget summary display
+    void updateBudgetSummary();
 
 private slots:
     void setTargetBudget();
@@ -42,7 +42,7 @@ private slots:
     void clearAllRecords();
     void createPieChart();
 signals:
-    void expensesAdded(); // Добавьте этот сигнал в ваш класс
+    void expensesAdded();
 };
 
 #endif

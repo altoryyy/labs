@@ -6,7 +6,7 @@
 
 class FinanceEntry
 {
-protected:
+private:
     std::string description;
     double amount;
     int id;

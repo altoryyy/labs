@@ -16,7 +16,7 @@ private:
     double targetBudget;
 
 public:
-    FinanceService(double initialBudget = 0.0);
+    explicit FinanceService(double initialBudget = 0.0);
     void setTargetBudget(double budget);
     void createRecord(const std::string &description, double amount, const std::string &type);
     void readRecords() const;
