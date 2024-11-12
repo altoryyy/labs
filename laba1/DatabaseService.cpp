@@ -81,37 +81,40 @@ void DatabaseService::clearRecords() const {
     }
 }
 
-bool DatabaseService::createRecord(const std::string &description, double amount, const std::string &type) const {
+int DatabaseService::createRecord(const std::string &description, double amount, const std::string &type) const {
     if (!isOpen) {
         std::cerr << "Database is not open. Cannot create record." << std::endl;
-        return false;
+        return -1;
     }
 
     executeSQL("BEGIN TRANSACTION;");
 
-    const char *sql = "INSERT INTO FinanceRecords (Description, Amount, Type) VALUES (?, ?, ?);";
+    const char *sql = "INSERT INTO FinanceRecords (Description, Amount, Type) VALUES (?, ?, ?) RETURNING ID;";
     sqlite3_stmt *stmt = prepareStatement(sql);
 
     if (!stmt) {
         std::cerr << "Failed to prepare statement for creating record." << std::endl;
         executeSQL("ROLLBACK;");
-        return false;
+        return -1;
     }
 
     sqlite3_bind_text(stmt, 1, description.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_double(stmt, 2, amount);
     sqlite3_bind_text(stmt, 3, type.c_str(), -1, SQLITE_STATIC);
 
-    if (sqlite3_step(stmt) != SQLITE_DONE) {
+    int recordId = -1;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        recordId = sqlite3_column_int(stmt, 0);
+    } else {
         std::cerr << "Error inserting record: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_finalize(stmt);
         executeSQL("ROLLBACK;");
-        return false;
+        return -1;
     }
 
     sqlite3_finalize(stmt);
     executeSQL("COMMIT;");
-    return true;
+    return recordId;
 }
 
 std::unique_ptr<FinanceEntry> DatabaseService::getRecordById(int id) const {
@@ -142,4 +145,22 @@ std::unique_ptr<FinanceEntry> DatabaseService::getRecordById(int id) const {
 
     sqlite3_finalize(stmt);
     return record;
+}
+
+int DatabaseService::getLastInsertedId() const {
+    const char *sql = "SELECT last_insert_rowid();";
+    sqlite3_stmt *stmt;
+    int lastId = -1;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        throw CustomException("Ошибка подготовки запроса: " + std::string(sqlite3_errmsg(db)));
+    }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        lastId = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+
+    return lastId;
 }
