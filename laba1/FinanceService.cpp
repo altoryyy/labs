@@ -122,7 +122,7 @@ void FinanceService::deleteRecord(int id) const {
     try {
         dbService.executeSQL(sql);
     } catch (const std::exception &e) {
-        throw CustomException("Ошибка удаления записи с ID " + std::to_string(id) + ": " + e.what());
+        throw CustomException(std::format("Ошибка удаления записи с ID {}: {}", id, e.what()));
     }
 }
 
@@ -130,7 +130,7 @@ std::unique_ptr<FinanceEntry> FinanceService::getRecordById(int id) const {
     const DatabaseService &dbService = DatabaseService::getInstance();
     auto record = dbService.getRecordById(id);
     if (!record) {
-        throw CustomException("Запись с ID " + std::to_string(id) + " не найдена!");
+        throw CustomException(std::format("Запись с ID {} не найдена!", id));
     }
     return record;
 }
@@ -268,7 +268,7 @@ void FinanceService::clearRecords() const {
 }
 
 void FinanceService::loadBudget() {
-    DatabaseService& dbService = DatabaseService::getInstance();
+    const DatabaseService& dbService = DatabaseService::getInstance();
     budget.loadBudgetFromDatabase(dbService.getDb());
 }
 
