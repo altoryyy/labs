@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include "ActionManager.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -31,6 +32,7 @@ private:
     QListWidget *expenseListWidget;
     FinanceService financeService;
     QLabel *budgetSummaryLabel;
+    ActionManager actionManager;
     void loadRecords();
     void updateBudgetSummary();
 
@@ -41,6 +43,7 @@ private slots:
     void updateRecord();
     void clearAllRecords();
     void createPieChart();
+    void undoLastAction();
 signals:
     void expensesAdded();
 };

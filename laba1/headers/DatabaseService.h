@@ -7,6 +7,7 @@
 #include "FinanceEntry.h"
 #include "ExpenseRecord.h"
 #include "IncomeRecord.h"
+#include "CustomException.h"
 
 class DatabaseService {
 private:
@@ -23,16 +24,18 @@ public:
     DatabaseService &operator=(DatabaseService &&other) noexcept = default;
 
     static inline DatabaseService& getInstance() {
+        static DatabaseService instance;
         return instance;
     }
 
     bool openDatabase(const std::string &dbName);
     void closeDatabase();
     void clearRecords() const;
-    bool createRecord(const std::string &description, double amount, const std::string &type) const;
+    int createRecord(const std::string &description, double amount, const std::string &type) const;
     std::unique_ptr<FinanceEntry> getRecordById(int id) const;
     void executeSQL(const std::string &sql) const;
     sqlite3_stmt *prepareStatement(const std::string &sql) const;
+    int getLastInsertedId() const;
 
     sqlite3 *getDb() const { return db; }
 

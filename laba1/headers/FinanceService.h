@@ -30,8 +30,8 @@ public:
     void clearRecords() const;
     std::unique_ptr<FinanceEntry> getRecordById(int id) const;
 
-    void createIncome(const std::string &description, double amount);
-    void createExpense(const std::string &description, double amount);
+    int createIncome(const std::string &description, double amount);
+    int createExpense(const std::string &description, double amount);
     void displayBudgetSummary() const;
     void displayIncomeRecords() const;
     void displayExpenseRecords() const;
@@ -41,6 +41,7 @@ public:
 
     double calculateTotalIncome() const;
     double calculateTotalExpenses() const;
+    int getLastRecordId() const;
 
     void loadBudget();
     void saveBudget() const;
