@@ -17,16 +17,14 @@ struct Action {
 
 class ActionManager {
 public:
-    ActionManager(FinanceService &service) : financeService(service) {}
+    explicit ActionManager(FinanceService &service) : financeService(service) {}
 
     void addIncome(const std::string &description, double amount) {
-
         int recordId = financeService.createIncome(description, amount);
         actionStack.push(Action{Action::Type::AddIncome, description, amount, recordId});
     }
 
     void addExpense(const std::string &description, double amount) {
-
         int recordId = financeService.createExpense(description, amount);
         actionStack.push(Action{Action::Type::AddExpense, description, amount, recordId});
     }
@@ -45,12 +43,14 @@ public:
         Action lastAction = actionStack.top();
         actionStack.pop();
 
+        using enum Action::Type;
+
         switch (lastAction.type) {
-        case Action::Type::AddIncome:
-        case Action::Type::AddExpense:
+        case AddIncome:
+        case AddExpense:
             financeService.deleteRecord(lastAction.recordId);
             break;
-        case Action::Type::DeleteRecord:
+        case DeleteRecord:
             financeService.createExpense(lastAction.description, lastAction.amount);
             break;
         }
@@ -61,4 +61,4 @@ private:
     Stack<Action> actionStack;
 };
 
-#endif
+#endif // ACTIONMANAGER_H
