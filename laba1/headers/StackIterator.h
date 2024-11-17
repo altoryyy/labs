@@ -6,7 +6,7 @@
 template<typename T>
 class StackIterator {
 public:
-    StackIterator(typename std::vector<T>::reverse_iterator it) : current(it) {}
+    explicit StackIterator(typename std::vector<T>::reverse_iterator it) : current(it) {}
 
     T& operator*() {
         return *current;
