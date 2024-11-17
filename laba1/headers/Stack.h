@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <memory>
+#include "StackIterator.h" // Подключаем заголовок с определением итератора
 
 template<typename T>
 class Stack {
@@ -45,6 +46,16 @@ public:
 
     void clear() {
         data.clear();
+    }
+
+    using Iterator = StackIterator<T>;
+
+    Iterator begin() {
+        return Iterator(data.rbegin());
+    }
+
+    Iterator end() {
+        return Iterator(data.rend());
     }
 
 private:
